@@ -1,0 +1,6 @@
+INSTANCE_STATES
+===============
+running
+pending
+stopped
+terminated

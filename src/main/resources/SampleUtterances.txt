@@ -1,0 +1,20 @@
+countRunningInstances count instances
+countRunningInstances count running instances
+
+countInstances How many instances are {instanceState}
+countInstances How many instances are a {instanceState} state
+
+deployTomcat deploy tomcat
+
+buildCloudformation Build a cloudformation stack
+
+cloudwatchAlarms Do I have any CloudWatch Alarms
+
+sendSnsNotification send notification
+
+AMAZON.HelpIntent help
+AMAZON.HelpIntent help me
+
+AMAZON.StopIntent stop
+
+AMAZON.CancelIntent cancel
