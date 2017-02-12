@@ -1,16 +1,27 @@
-countRunningInstances count instances
-countRunningInstances count running instances
+OnCallIntent Who is on call
+OnCallIntent Who is available
 
-countInstances How many instances are {instanceState}
-countInstances How many instances are a {instanceState} state
+OpenIncidentsIntent List open incidents
+OpenIncidentsIntent What incidents are open
 
-deployTomcat deploy tomcat
+MyOpenIncidentsIntent List my open incidents
+MyOpenIncidentsIntent List incidents assigned to me
+MyOpenIncidentsIntent List incidents routed to me
 
-buildCloudformation Build a cloudformation stack
+IncidentStatusIntent Has incident {{ incident_number}} been acknowledged
 
-cloudwatchAlarms Do I have any CloudWatch Alarms
+UnacknowledgedIncidentsIntent List unacknowledged incidents
+UnacknowledgedIncidentsIntent List all unacknowledged incidents
 
-sendSnsNotification send notification
+UnacknowledgedIncidentsCriticalIntent List unacknowledged critical incidents
+UnacknowledgedIncidentsCritialIntent List all unacknowledged critical incidents
+
+RerouteIncidentIntent Reroute incident {{ incident_number }} to {{ team }}
+RerouteIncidentIntent Assign incident {{ incident_number }} to {{ team }}
+
+AcknowledgeIncident Acknowledge incident {{ incident_number }}
+
+ResolveIncidentIntent Resolve incident {{ incident_number }}
 
 AMAZON.HelpIntent help
 AMAZON.HelpIntent help me
