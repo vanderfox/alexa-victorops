@@ -117,7 +117,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         switch(request.intent.name) {
            case "OpenIncidentsIntent":
-                   getIncidents()
+                   getOpenIncidents()
                 break
             case "AMAZON.StopIntent":
             case "AMAZON.CancelIntent":
@@ -215,7 +215,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         SpeechletResponse.newAskResponse(speech, reprompt, card)
     }
 
-    SpeechletResponse getIncidents() {
+    SpeechletResponse getOpenIncidents() {
 
 
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
