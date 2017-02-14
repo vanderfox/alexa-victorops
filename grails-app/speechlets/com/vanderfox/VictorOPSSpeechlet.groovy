@@ -230,27 +230,17 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         //def json = new JsonngSlurper().parseText(response.data.toString())
         // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         String speechText = ""
-        response.data.incidents.each { incident ->
+        response.data.get("incidents").each { incident ->
             //Date date = format.parse(incident.startTime)
             if(speechText == "") {
-                speechText = "You have ${incidents.size()} incidents.\n\nYour first incident is:\n\n"
+                speechText = "You have ${response.data.get("incidents").size()} incidents.\n\nYour first incident is:\n\n"
             } else {
                 speechText +="Next incident\n\n"
             }
             speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${incident.startTime}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
         }
 
-
-        // Create the Simple card content.
-        SimpleCard card = new SimpleCard(title: "Open Incidents", content: speechText)
-
-        // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
-
-        // Create reprompt
-        Reprompt reprompt = new Reprompt(outputSpeech: speech)
-
-        tellResponse(speech, reprompt, card)
+        tellResponse(speechText, speechText)
     }
 
     /**
