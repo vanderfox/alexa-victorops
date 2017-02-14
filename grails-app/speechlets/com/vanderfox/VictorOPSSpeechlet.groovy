@@ -114,7 +114,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                 session.getSessionId())
 
         log.debug("invoking intent:${request.intent.name}")
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+
         switch(request.intent.name) {
            case "OpenIncidentsIntent":
                    getIncidents()
@@ -222,29 +222,12 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
         client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
-
-        def response = client.get(path:'user')
-
-        System.out.println(response.data.toString())
-
-        //client = new RESTClient('https://api.victorops.com/api-public/v1/user')
-        //client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        //client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
-        //client.defaultRequestHeaders.'Accept' = "application/json"
-
-        //response = client.get(path:'/lee.fox')
-
-        //System.out.println(response.data.toString())
-        client = new RESTClient('https://api.victorops.com/api-public/v1/')
-        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
-        client.defaultRequestHeaders.'Accept' = "application/json"
-
-        response = client.get(path:'incidents')
+        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
+        def response = client.get(path:'incidents')
 
 
         //System.out.println(response.data.toString())
-        //def json = new JsonSlurper().parseText(response.data.toString())
+        //def json = new JsonngSlurper().parseText(response.data.toString())
         // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         String speechText = ""
         response.data.incidents.each { incident ->
@@ -307,7 +290,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
      void getUsers() {
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/user')
         client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
         def response = client.get()
 
