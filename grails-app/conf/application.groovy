@@ -22,8 +22,8 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 		//[pattern: '/logout/**', access: ['permitAll']],
 		[pattern: '/registrationCode/**', access: ['permitAll']],
 		[pattern: '/awsCredentials/**', access: ['isFullyAuthenticated()']],
-		[pattern: '/devopsAssistant/devOps/**', access: ['permitAll']],
-		[pattern: '/devOps/**', access: ['permitAll']],
+		[pattern: '/victorops/victorOPS/**', access: ['permitAll']],
+		[pattern: '/victorOPS/**', access: ['permitAll']],
 		[pattern: '/securityInfo/**', access: ['permitAll']],
 		[pattern: '/user/**', access: ['permitAll']],
 		[pattern: '/role/**', access: ['ROLE_ADMIN']],
@@ -65,14 +65,14 @@ DevopsAssistantSpeechlet {
 }
 com.amazon.speech.speechlet.servlet.disableRequestSignatureCheck=true
 // these are fallback appids comma delimited
-//skillsSdk.supportedApplicationIds="amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
-skillsSdk.supportedApplicationIds=""
 
-alexaSkills.supportedApplicationIds="amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
+alexaSkills.supportedApplicationIds="amzn1.ask.skill.44951a75-4d6f-41f7-b558-0f0b68b8b1e4"
 alexaSkills.disableVerificationCheck = true // helpful for debugging or replay a command via curl
 alexaSkills.serializeRequests = true // this logs the requests to disk to help you debug
 alexaSkills.serializeRequestsOutputPath = "/tmp/"
 alexaSkills.oauth.redirectUrls = ['https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK','https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK']
+victorOPS.apiId = ""
+victorOPS.apiKey = ""
 
 grails {
 	mail {

@@ -23,6 +23,8 @@ import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
 import grails.web.Controller
 import groovy.util.logging.Slf4j
+import groovyx.net.http.*
+
 
 
 @Slf4j
@@ -111,16 +113,14 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
 
-        log.debug("invoking intent:${intentName}")
+        log.debug("invoking intent:${request.intent.name}")
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
-        // Create the Simple card content.
-        SimpleCard card = new SimpleCard(title:"Twitter Search Results")
-        def speechText = "I will say something"
-        def cardText = "I will print something"
-        // Create the plain text output.
-        speech.setText(speechText)
-        card.setContent(cardText)
-        SpeechletResponse.newTellResponse(speech, card)
+        switch(request.intent.name) {
+           case "OpenIncidentsIntent":
+                   getIncidents()
+                break
+        }
+
 
     }
     /**
@@ -145,10 +145,60 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     SpeechletResponse getWelcomeResponse()  {
-        String speechText = "Say something when the skill starts"
+        String speechText = "Welcome to the VictorOPS skill - say List Open Incidents for open incidents"
 
         // Create the Simple card content.
-        SimpleCard card = new SimpleCard(title: "YourWelcomeCardTitle", content: speechText)
+        SimpleCard card = new SimpleCard(title: "VictorOPS", content: speechText)
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
+
+        // Create reprompt
+        Reprompt reprompt = new Reprompt(outputSpeech: speech)
+
+        SpeechletResponse.newAskResponse(speech, reprompt, card)
+    }
+
+    SpeechletResponse getIncidents() {
+
+
+        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
+        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'Accept' = "application/json"
+
+        def response = client.get(path:'user')
+
+        System.out.println(response.data.toString())
+
+        //client = new RESTClient('https://api.victorops.com/api-public/v1/user')
+        //client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        //client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        //client.defaultRequestHeaders.'Accept' = "application/json"
+
+        //response = client.get(path:'/lee.fox')
+
+        //System.out.println(response.data.toString())
+        client = new RESTClient('https://api.victorops.com/api-public/v1/')
+        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'Accept' = "application/json"
+
+        response = client.get(path:'incidents')
+
+
+        //System.out.println(response.data.toString())
+        //def json = new JsonSlurper().parseText(response.data.toString())
+        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+        String speechText = ""
+        response.data.incidents.each { incident ->
+            //Date date = format.parse(incident.startTime)
+            speechText += "incident id: ${incident.incidentNumber} currentPhase:${incident.currentPhase} displayName:${incident.entityDisplayName} starttime:${incident.startTime}"
+        }
+
+
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard(title: "Open Incidents", content: speechText)
 
         // Create the plain text output.
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
@@ -193,7 +243,21 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         SpeechletResponse.newTellResponse(speech, card)
     }
 
+     void getUsers() {
+        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/user')
+        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'Accept' = "application/json"
+        def response = client.get()
+
+
+        System.out.println(response)
+    }
+
+
 }
+
+
 
 
 /**
