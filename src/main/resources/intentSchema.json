@@ -1,37 +1,7 @@
 {
     "intents": [
         {
-            "intent": "countRunningInstances"
-        },
-        {
-            "intent": "cloudwatchAlarms"
-        },
-        {
-            "intent": "sendSnsNotification"
-        },
-        {
-            "intent": "deployTomcat"
-        },
-        {
-            "intent": "buildCloudformation"
-        },
-        {
-            "intent": "countInstances",
-            "slots": [
-                {
-                    "name": "instanceState",
-                    "type": "INSTANCE_STATES"
-                }
-            ]
-        },
-        {
-            "intent": "AMAZON.HelpIntent"
-        },
-        {
-            "intent": "AMAZON.StopIntent"
-        },
-        {
-            "intent": "AMAZON.CancelIntent"
+            "intent": "OpenIncidentsIntent"
         }
     ]
 }
