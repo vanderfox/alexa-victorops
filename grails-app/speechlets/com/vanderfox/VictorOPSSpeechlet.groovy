@@ -119,9 +119,65 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
            case "OpenIncidentsIntent":
                    getIncidents()
                 break
+            case "AMAZON.StopIntent":
+            case "AMAZON.CancelIntent":
+                sayGoodbye()
+                break
+            case "AMAZON.HelpIntent":
+                getHelpResponse()
+                break
+            default:
+                didNotUnderstand()
+                break
         }
 
 
+    }
+
+
+
+    private SpeechletResponse askResponse(String cardText, String speechText) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard()
+        card.setTitle("DevOps Assistant")
+        card.setContent(cardText)
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
+
+        // Create reprompt
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(speech)
+
+        SpeechletResponse.newAskResponse(speech, reprompt, card)
+    }
+
+    private SpeechletResponse tellResponse(String cardText, String speechText) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard()
+        card.setTitle("DevOps Assistant")
+        card.setContent(cardText)
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
+
+        // Create reprompt
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(speech)
+
+        SpeechletResponse.newTellResponse(speech, card)
+    }
+
+    private SpeechletResponse sayGoodbye() {
+        String speechText = "OK.  I'm going to stop now."
+        tellResponse(speechText, speechText)
+    }
+
+    private SpeechletResponse didNotUnderstand() {
+        String speechText = "I'm sorry.  I didn't understand what you said.  Say list open incidents to list open incidents"
+        askResponse(speechText, speechText)
     }
     /**
      * Grails config is injected here for configuration of your speechlet
@@ -211,7 +267,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         // Create reprompt
         Reprompt reprompt = new Reprompt(outputSpeech: speech)
 
-        SpeechletResponse.newAskResponse(speech, reprompt, card)
+        tellResponse(speech, reprompt, card)
     }
 
     /**
