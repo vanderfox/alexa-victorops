@@ -25,6 +25,10 @@ import grails.web.Controller
 import groovy.util.logging.Slf4j
 import groovyx.net.http.*
 
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 
 @Slf4j
@@ -231,13 +235,16 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         String speechText = ""
         response.data.get("incidents").each { incident ->
+            DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
+            ZonedDateTime zdt = ZonedDateTime.parse(incident.startTime, f)
+            //LocalDate incidentTime = LocalDate.parse(zdt, DateTimeFormatter.ISO_INSTANT)
             //Date date = format.parse(incident.startTime)
             if(speechText == "") {
                 speechText = "You have ${response.data.get("incidents").size()} incidents.\n\nYour first incident is:\n\n"
             } else {
                 speechText +="Next incident\n\n"
             }
-            speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${incident.startTime}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
+            speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
         }
 
         tellResponse(speechText, speechText)
