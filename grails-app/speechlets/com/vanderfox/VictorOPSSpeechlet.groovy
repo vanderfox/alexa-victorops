@@ -224,7 +224,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         client.defaultRequestHeaders.'Accept' = "application/json"
         log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
         def response = client.get(path:'incidents')
-
+        log.debug("Got incidents")
 
         //System.out.println(response.data.toString())
         //def json = new JsonngSlurper().parseText(response.data.toString())
@@ -233,7 +233,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         response.data.incidents.each { incident ->
             //Date date = format.parse(incident.startTime)
             if(speechText == "") {
-                speechText = "You have ${incidents.length} incidents.\n\nYour first incident is:\n\n"
+                speechText = "You have ${incidents.size()} incidents.\n\nYour first incident is:\n\n"
             } else {
                 speechText +="Next incident\n\n"
             }
