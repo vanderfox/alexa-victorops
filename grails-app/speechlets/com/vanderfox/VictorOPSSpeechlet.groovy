@@ -250,7 +250,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         response.data.incidents.each { incident ->
             //Date date = format.parse(incident.startTime)
             if(speechText == "") {
-                speechText = "You have ${incidents.length}\n\nYour first incident is:\n\n"
+                speechText = "You have ${incidents.length} incidents.\n\nYour first incident is:\n\n"
             } else {
                 speechText +="Next incident\n\n"
             }
