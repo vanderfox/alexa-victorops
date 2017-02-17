@@ -1,30 +1,4 @@
-OnCallIntent Who is on call
-OnCallIntent Who is available
-
 OpenIncidentsIntent List open incidents
 OpenIncidentsIntent What incidents are open
-
-MyOpenIncidentsIntent List my open incidents
-MyOpenIncidentsIntent List incidents assigned to me
-MyOpenIncidentsIntent List incidents routed to me
-
-IncidentStatusIntent Has incident {{ incident_number}} been acknowledged
-
-UnacknowledgedIncidentsIntent List unacknowledged incidents
-UnacknowledgedIncidentsIntent List all unacknowledged incidents
-
-UnacknowledgedIncidentsCriticalIntent List unacknowledged critical incidents
-UnacknowledgedIncidentsCritialIntent List all unacknowledged critical incidents
-
-RerouteIncidentIntent Reroute incident {{ incident_number }} to {{ team }}
-RerouteIncidentIntent Assign incident {{ incident_number }} to {{ team }}
-
-AckIncident Acknowledge incident {{ incidentNumber }}
-ResolveIncident Resolve incident {{ incidentNumber }}
-
-AMAZON.HelpIntent help
-AMAZON.HelpIntent help me
-
-AMAZON.StopIntent stop
-
-AMAZON.CancelIntent cancel
+AckIncident Acknowledge incident {incidentNumber}
+ResolveIncident Resolve incident {incidentNumber}
