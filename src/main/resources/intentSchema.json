@@ -2,6 +2,24 @@
     "intents": [
         {
             "intent": "OpenIncidentsIntent"
+        },
+        {
+            "intent": "ResolveIncident",
+            "slots": [
+                {
+                    "name": "incidentNumber",
+                    "type": "AMAZON.NUMBER"
+                }
+            ]
+        },
+        {
+            "intent": "AckIncident",
+            "slots": [
+                {
+                    "name": "incidentNumber",
+                    "type": "AMAZON.NUMBER"
+                }
+            ]
         }
     ]
 }

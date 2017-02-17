@@ -19,9 +19,8 @@ UnacknowledgedIncidentsCritialIntent List all unacknowledged critical incidents
 RerouteIncidentIntent Reroute incident {{ incident_number }} to {{ team }}
 RerouteIncidentIntent Assign incident {{ incident_number }} to {{ team }}
 
-AcknowledgeIncident Acknowledge incident {{ incident_number }}
-
-ResolveIncidentIntent Resolve incident {{ incident_number }}
+AckIncident Acknowledge incident {{ incidentNumber }}
+ResolveIncident Resolve incident {{ incidentNumber }}
 
 AMAZON.HelpIntent help
 AMAZON.HelpIntent help me

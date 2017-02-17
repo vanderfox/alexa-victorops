@@ -36,9 +36,8 @@ if(logToFile) {
 root(WARN, appendersList)
 
 [
-        'com.com.com.vanderfox',
-        'com.com.vanderfox',
-        'devopsassistant'
+        'com.vanderfox',
+        'victorOPS'
         //'org.grails.plugins',
         //'org.springframework',
 

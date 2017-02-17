@@ -55,14 +55,7 @@ grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'com.c
 grails.plugin.springsecurity.ui.register.emailFrom = 'skills@com.com.vanderfox.com'
 grails.plugin.springsecurity.logout.postOnly = false
 //you can put fallback credentials here - if a user is not linked, or has none it will use these to demo
-DevopsAssistantSpeechlet {
 
-	accessToken = ""
-	accessTokenSecret = ""
-	// these app IDs are a comma delimited list you get from developer.amazon.com when you set up the app on your account
-	//awsApplicationId = "amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
-	awsApplicationId = ""
-}
 com.amazon.speech.speechlet.servlet.disableRequestSignatureCheck=true
 // these are fallback appids comma delimited
 
@@ -71,8 +64,8 @@ alexaSkills.disableVerificationCheck = true // helpful for debugging or replay a
 alexaSkills.serializeRequests = true // this logs the requests to disk to help you debug
 alexaSkills.serializeRequestsOutputPath = "/tmp/"
 alexaSkills.oauth.redirectUrls = ['https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK','https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK']
-victorOPS.apiId = ""
-victorOPS.apiKey = ""
+victorOPS.apiId = "3cb197e7"
+victorOPS.apiKey = "f67e210930426baa610c8b4737835577"
 
 grails {
 	mail {

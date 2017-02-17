@@ -1,5 +1,6 @@
 package com.vanderfox
 
+import com.amazon.speech.slu.Slot
 import com.amazon.speech.speechlet.IntentRequest
 import com.amazon.speech.speechlet.LaunchRequest
 import com.amazon.speech.speechlet.Session
@@ -123,6 +124,16 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
            case "OpenIncidentsIntent":
                    getOpenIncidents()
                 break
+            case "ResolveIncident":
+                Slot incidentNumber = request.intent.getSlot("incidentNumber")
+                log.debug("incident number:"+incidentNumber.value)
+                   changeIncidentStatus(incidentNumber.value as Integer,"resolve")
+                break
+            case "AckIncident":
+                Slot incidentNumber = request.intent.getSlot("incidentNumber")
+                log.debug("incident number:"+incidentNumber.value)
+                changeIncidentStatus(incidentNumber.value as Integer,"ack")
+                break
             case "AMAZON.StopIntent":
             case "AMAZON.CancelIntent":
                 sayGoodbye()
@@ -219,6 +230,47 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         SpeechletResponse.newAskResponse(speech, reprompt, card)
     }
 
+
+    SpeechletResponse whoIsOnCall() {
+
+        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
+        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'Accept' = "application/json"
+        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
+        def response = client.get(path:'incidents')
+        log.debug("Got incidents")
+
+        String speechText = ""
+
+        response.data.get("incidents").each { incident ->
+
+
+        }
+        tellResponse(speechTest,speechText)
+    }
+
+
+    SpeechletResponse changeIncidentStatus(int incidentStats, String status) {
+
+        // send either 'ack' or 'resolve' on the status param
+        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
+        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'Accept' = "application/json"
+        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
+        def response = client.get(path:incidentStats)
+        log.debug("Got response for ${incidentStats}")
+
+        String speechText = ""
+
+        response.data.get("results").each { result ->
+             speechText += "Incident ${result.incidentNumber} set to ${result.message}"
+        }
+        tellResponse(speechText,speechText)
+    }
+
+
     SpeechletResponse getOpenIncidents() {
 
 
@@ -230,21 +282,24 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         def response = client.get(path:'incidents')
         log.debug("Got incidents")
 
-        //System.out.println(response.data.toString())
-        //def json = new JsonngSlurper().parseText(response.data.toString())
-        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         String speechText = ""
+        int incidentCount = 0
+        response.data.get("incidents").each { incident ->
+            if (incident.currentPhase != "RESOLVED") {
+                incidentCount++
+            }
+        }
         response.data.get("incidents").each { incident ->
             DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
             ZonedDateTime zdt = ZonedDateTime.parse(incident.startTime, f)
-            //LocalDate incidentTime = LocalDate.parse(zdt, DateTimeFormatter.ISO_INSTANT)
-            //Date date = format.parse(incident.startTime)
-            if(speechText == "") {
-                speechText = "You have ${response.data.get("incidents").size()} incidents.\n\nYour first incident is:\n\n"
-            } else {
-                speechText +="Next incident\n\n"
+            if (incident.currentPhase != "RESOLVED") {
+                if (speechText == "") {
+                    speechText = "You have ${incidentCount} incidents.\n\nYour first incident is:\n\n"
+                } else {
+                    speechText += "Next incident\n\n"
+                }
+                speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
             }
-            speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
         }
 
         tellResponse(speechText, speechText)
