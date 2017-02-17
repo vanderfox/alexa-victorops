@@ -251,16 +251,19 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
 
-    SpeechletResponse changeIncidentStatus(int incidentStats, String status) {
+    SpeechletResponse changeIncidentStatus(String username, String status) {
 
         // send either 'ack' or 'resolve' on the status param
-        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
+        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/incidents/byUser/')
         client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
         client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
         log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
-        def response = client.get(path:incidentStats)
-        log.debug("Got response for ${incidentStats}")
+        def postBody = [username: username, message: 'updated by Alexa Skill'] // will be url-encoded
+
+        def response = client.patch(path:status,postBody: postBody)
+
+        log.debug("Got response for ${username}")
 
         String speechText = ""
 

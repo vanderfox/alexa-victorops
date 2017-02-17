@@ -7,8 +7,8 @@
             "intent": "ResolveIncident",
             "slots": [
                 {
-                    "name": "incidentNumber",
-                    "type": "AMAZON.NUMBER"
+                    "name": "username",
+                    "type": "username"
                 }
             ]
         },
@@ -16,8 +16,8 @@
             "intent": "AckIncident",
             "slots": [
                 {
-                    "name": "incidentNumber",
-                    "type": "AMAZON.NUMBER"
+                    "name": "username",
+                    "type": "username"
                 }
             ]
         }

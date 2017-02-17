@@ -1,4 +1,6 @@
 OpenIncidentsIntent List open incidents
 OpenIncidentsIntent What incidents are open
-AckIncident Acknowledge incident {incidentNumber}
-ResolveIncident Resolve incident {incidentNumber}
+AckIncident Acknowledge incident {username}
+AckIncident Acknowledge incidents for {username}
+ResolveIncident Resolve incident {username}
+ResolveIncident Resolve incidents for {username}
