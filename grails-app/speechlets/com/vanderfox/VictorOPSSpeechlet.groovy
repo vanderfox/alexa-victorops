@@ -271,6 +271,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         response.data.get("results").each { result ->
              speechText += "Incident ${result.incidentNumber} set to ${result.message}"
         }
+        if (speechText.length() == 0) {
+            speechText += "There were no incidents to update"
+        }
         tellResponse(speechText,speechText)
     }
 
