@@ -259,7 +259,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
         log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
-        def postBody = [username: username, message: 'updated by Alexa Skill'] // will be url-encoded
+        def postBody = [userName: username, message: 'updated by Alexa Skill'] // will be url-encoded
 
         def response = client.patch(path:status,postBody: postBody)
 
