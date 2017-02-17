@@ -25,6 +25,7 @@ import grails.core.support.GrailsConfigurationAware
 import grails.web.Controller
 import groovy.util.logging.Slf4j
 import groovyx.net.http.*
+import static groovyx.net.http.ContentType.JSON
 
 import java.time.LocalDate
 import java.time.ZoneId
@@ -125,14 +126,14 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                    getOpenIncidents()
                 break
             case "ResolveIncident":
-                Slot incidentNumber = request.intent.getSlot("incidentNumber")
+                Slot incidentNumber = request.intent.getSlot("username")
                 log.debug("incident number:"+incidentNumber.value)
-                   changeIncidentStatus(incidentNumber.value as Integer,"resolve")
+                   changeIncidentStatus(incidentNumber.value,"resolve")
                 break
             case "AckIncident":
-                Slot incidentNumber = request.intent.getSlot("incidentNumber")
+                Slot incidentNumber = request.intent.getSlot("username")
                 log.debug("incident number:"+incidentNumber.value)
-                changeIncidentStatus(incidentNumber.value as Integer,"ack")
+                changeIncidentStatus(incidentNumber.value,"ack")
                 break
             case "AMAZON.StopIntent":
             case "AMAZON.CancelIntent":
@@ -259,9 +260,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
         log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
-        def postBody = [userName: username, message: 'updated by Alexa Skill'] // will be url-encoded
+        def postBody = [userName: username, message: 'updatedbyAlexaSkill'] // will be url-encoded
 
-        def response = client.patch(path:status,postBody: postBody)
+        def response = client.patch(path:status,body: postBody, requestContentType: JSON)
 
         log.debug("Got response for ${username}")
 
