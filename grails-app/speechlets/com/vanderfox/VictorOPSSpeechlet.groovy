@@ -307,12 +307,18 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     SpeechletResponse changeIncidentStatus(String status, Map incident, Session speechletSession) {
 
         // send either 'ack' or 'resolve' on the status param
+        if (status == "ack" && incident.currentPhase == "ACKED") {
+            // say next incident
+            int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
+            speechletSession.setAttribute("incidentIndex",++incidentIndex)
+            return sayIncident(speechletSession,false,"\n Incident is already acknowledged.\ns")
+        }
         RESTClient client = new RESTClient("https://api.victorops.com/api-public/v1/incidents/${status}")
         client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
         client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
         log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
-        def postBody = [userName: incident.username, incidentNames: [incident.entityDisplayName], message: 'updatedbyAlexaSkill'] // will be url-encoded
+        def postBody = [userName: grailsApplication.config.victorOPS.userName, incidentNames: [incident.entityDisplayName], message: 'updatedbyAlexaSkill'] // will be url-encoded
 
         def response = client.patch(path:status,body: postBody, requestContentType: JSON)
 
@@ -333,19 +339,29 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     }
 
-    SpeechletResponse sayIncident(Session speechletSession, Boolean sayCount = false) {
+    SpeechletResponse sayIncident(Session speechletSession, Boolean sayCount = false, String speechText = "") {
 
         int indicentIndex = speechletSession.getAttribute("incidentIndex") as Integer
         List<Map> incidents = speechletSession.getAttribute("incidents") as List<Map>
-        String speechText = ""
+
         if (sayCount) {
             speechText = "You have ${incidents.size()} incidents"
 
         }
         DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
-        ZonedDateTime zdt = ZonedDateTime.parse(incidents[indicentIndex].startTime, f)
-        speechText += "incident i d ${incidents[indicentIndex].incidentNumber}\n\n${incidents[indicentIndex].entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incidents[indicentIndex].currentPhase}\n\n\n"
-        speechText += "Would you like to Acknowledge Resolve Redirect or go to next incident?"
+        def incident = incidents[indicentIndex]
+        if (!incident) {
+            def s = "You have no more incidents."
+            return tellResponse(s,s)
+        }
+        ZonedDateTime zdt = ZonedDateTime.parse(incident.startTime, f)
+        speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
+        if (incident.currentPhase == "ACKED") {
+            speechText += "Would you like to Resolve or go to next incident?"
+        } else {
+            speechText += "Would you like to Acknowledge Resolve or go to next incident?"
+        }
+
 
         askResponse(speechText, speechText)
 
