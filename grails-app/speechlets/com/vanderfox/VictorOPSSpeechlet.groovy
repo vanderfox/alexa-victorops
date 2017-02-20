@@ -310,7 +310,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         if (status == "ack" && incident.currentPhase == "ACKED") {
             // say next incident
             int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
-            speechletSession.setAttribute("incidentIndex",++incidentIndex)
+            speechletSession.setAttribute("incidentIndex",incidentIndex+1)
             return sayIncident(speechletSession,false,"\n Incident is already acknowledged.\ns")
         }
         RESTClient client = new RESTClient("https://api.victorops.com/api-public/v1/incidents/${status}")
@@ -361,7 +361,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         } else {
             speechText += "Would you like to Acknowledge Resolve or go to next incident?"
         }
-
+        speechletSession.setAttribute("incidentIndex", indicentIndex+1)
 
         askResponse(speechText, speechText)
 
