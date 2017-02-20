@@ -4,7 +4,7 @@
             "intent": "OpenIncidentsIntent"
         },
         {
-            "intent": "ResolveIncident",
+            "intent": "ResolveIncidentByUser",
             "slots": [
                 {
                     "name": "username",
@@ -13,13 +13,19 @@
             ]
         },
         {
-            "intent": "AckIncident",
+            "intent": "AckIncidentByUser",
             "slots": [
                 {
                     "name": "username",
                     "type": "username"
                 }
             ]
+        },
+        {
+            "intent": "ResolveIncident"
+        },
+        {
+            "intent": "AckIncident"
         },
         {
             "intent": "NextIncident"

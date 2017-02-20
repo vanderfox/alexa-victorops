@@ -1,9 +1,11 @@
 OpenIncidentsIntent List open incidents
 OpenIncidentsIntent What incidents are open
-AckIncident Acknowledge incident {username}
-AckIncident Acknowledge incidents for {username}
-ResolveIncident Resolve incident {username}
-ResolveIncident Resolve incidents for {username}
+AckIncidentByUser Acknowledge incident {username}
+AckIncidentByUser Acknowledge incidents for {username}
+ResolveIncidentByUser Resolve incident {username}
+ResolveIncidentByUser Resolve incidents for {username}
+AckIncident Acknowledge incident
+ResolveIncident Acknowledge incident
 NextIncident Next
 NextIncident Next incident
 AMAZON.StopIntent stop
