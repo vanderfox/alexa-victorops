@@ -192,7 +192,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     private SpeechletResponse didNotUnderstand() {
-        String speechText = "I'm sorry.  I didn't understand what you said.  Say list open incidents to list open incidents"
+        String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said.  Say list open incidents to list open incidents</speak>"
         askResponse(speechText, speechText)
     }
     /**
