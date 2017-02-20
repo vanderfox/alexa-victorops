@@ -4,3 +4,5 @@ AckIncident Acknowledge incident {username}
 AckIncident Acknowledge incidents for {username}
 ResolveIncident Resolve incident {username}
 ResolveIncident Resolve incidents for {username}
+NextIncident Next
+NextIncident Next incident

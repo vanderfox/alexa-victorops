@@ -20,6 +20,9 @@
                     "type": "username"
                 }
             ]
+        },
+        {
+            "intent": "NextIncident"
         }
     ]
 }
