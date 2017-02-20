@@ -123,14 +123,23 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         switch(request.intent.name) {
            case "OpenIncidentsIntent":
-                   getOpenIncidents()
+                   getOpenIncidents(session)
                 break
             case "ResolveIncident":
+                resolveIncident(session)
+                break
+            case "AckIncident":
+                ackIncident(session)
+                break
+            case "NextIncident":
+                nextIncident(session)
+                break
+            case "ResolveIncidentsForUser":
                 Slot incidentNumber = request.intent.getSlot("username")
                 log.debug("incident number:"+incidentNumber.value)
                    changeIncidentStatus(incidentNumber.value,"resolve")
                 break
-            case "AckIncident":
+            case "AckIncidentsForUser":
                 Slot incidentNumber = request.intent.getSlot("username")
                 log.debug("incident number:"+incidentNumber.value)
                 changeIncidentStatus(incidentNumber.value,"ack")
@@ -151,6 +160,24 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
 
+    private resolveIncident(Session speechletSession) {
+        List<Map> incidents = speechletSession.getAttribute("incidents") as List<Map>
+        int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
+
+        changeIncidentStatus("resolve",incidents[incidentIndex], speechletSession)
+    }
+
+    private ackIncident(Session speechletSession) {
+        List<Map> incidents = speechletSession.getAttribute("incidents") as List<Map>
+        int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
+
+        changeIncidentStatus("ack",incidents[incidentIndex], speechletSession)
+    }
+
+    private nextIncident(Session speechletSession) {
+
+        sayIncident(speechletSession,false)
+    }
 
     private SpeechletResponse askResponse(String cardText, String speechText) {
         // Create the Simple card content.
@@ -248,7 +275,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
 
         }
-        tellResponse(speechTest,speechText)
+        tellResponse(speechText,speechText)
     }
 
 
@@ -277,8 +304,53 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         tellResponse(speechText,speechText)
     }
 
+    SpeechletResponse changeIncidentStatus(String status, Map incident, Session speechletSession) {
 
-    SpeechletResponse getOpenIncidents() {
+        // send either 'ack' or 'resolve' on the status param
+        RESTClient client = new RESTClient("https://api.victorops.com/api-public/v1/incidents/${status}")
+        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'Accept' = "application/json"
+        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
+        def postBody = [userName: incident.username, incidentNames: [incident.entityDisplayName], message: 'updatedbyAlexaSkill'] // will be url-encoded
+
+        def response = client.patch(path:status,body: postBody, requestContentType: JSON)
+
+        log.debug("Got response for incident ${incident}")
+
+        String speechText = ""
+
+        response.data.get("results").each { result ->
+            speechText += "Incident ${result.incidentNumber} set to ${status}"
+        }
+        if (speechText.length() == 0) {
+            speechText += "There were no incidents to update"
+        }
+        // say next incident
+        int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
+        speechletSession.setAttribute("incidentIndex",++incidentIndex)
+        sayIncident(speechletSession,false)
+
+    }
+
+    SpeechletResponse sayIncident(Session speechletSession, Boolean sayCount = false) {
+
+        int indicentIndex = speechletSession.getAttribute("incidentIndex") as Integer
+        List<Map> incidents = speechletSession.getAttribute("incidents") as List<Map>
+        String speechText = ""
+        if (sayCount) {
+            speechText = "You have ${incidents.size()} incidents"
+
+        }
+        DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
+        ZonedDateTime zdt = ZonedDateTime.parse(incidents[indicentIndex].startTime, f)
+        speechText += "incident i d ${incidents[indicentIndex].incidentNumber}\n\n${incidents[indicentIndex].entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incidents[indicentIndex].currentPhase}\n\n\n"
+        speechText += "Would you like to Acknowledge Resolve Redirect or go to next incident?"
+
+        askResponse(speechText, speechText)
+
+    }
+    SpeechletResponse getOpenIncidents(Session speechletSession) {
 
 
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
@@ -290,26 +362,23 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         log.debug("Got incidents")
 
         String speechText = ""
-        int incidentCount = 0
-        response.data.get("incidents").each { incident ->
+        List<Map> filteredIncidents = new ArrayList<Map>()
+        response.data.get("incidents").each { Map incident ->
             if (incident.currentPhase != "RESOLVED") {
-                incidentCount++
+                filteredIncidents.add(incident)
             }
         }
-        response.data.get("incidents").each { incident ->
-            DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
-            ZonedDateTime zdt = ZonedDateTime.parse(incident.startTime, f)
-            if (incident.currentPhase != "RESOLVED") {
-                if (speechText == "") {
-                    speechText = "You have ${incidentCount} incidents.\n\nYour first incident is:\n\n"
-                } else {
-                    speechText += "Next incident\n\n"
-                }
-                speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
-            }
+        //speechText = "You have ${filteredIncidents.size()} incidents"
+
+        if (filteredIncidents.size() > 0) {
+            speechletSession.setAttribute("incidents",filteredIncidents)
+            speechletSession.setAttribute("incidentIndex",0)
+            sayIncident(speechletSession, true)
+        } else {
+            speechText = "You have no open incidents."
+            tellResponse(speechText, speechText)
         }
 
-        tellResponse(speechText, speechText)
     }
 
     /**
