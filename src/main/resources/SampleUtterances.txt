@@ -6,3 +6,8 @@ ResolveIncident Resolve incident {username}
 ResolveIncident Resolve incidents for {username}
 NextIncident Next
 NextIncident Next incident
+AMAZON.StopIntent stop
+AMAZON.StopIntent quit
+AMAZON.CancelIntent cancel
+AMAZON.HelpIntent help
+AMAZON.HelpIntent help me

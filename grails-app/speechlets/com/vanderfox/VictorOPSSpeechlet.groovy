@@ -217,7 +217,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     SpeechletResponse getWelcomeResponse()  {
-        String speechText = "Welcome to the Victor OPS skill - say List Open Incidents for open incidents"
+        String speechText = "Welcome to the VictorOPS skill - say List Open Incidents for open incidents"
 
         // Create the Simple card content.
         SimpleCard card = new SimpleCard(title: "VictorOPS", content: speechText)
