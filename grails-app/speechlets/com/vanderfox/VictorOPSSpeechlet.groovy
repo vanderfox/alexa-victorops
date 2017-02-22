@@ -41,6 +41,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     Config grailsConfig
     def speechletService
 
+    static final String INCIDENT_INDEX = "incidentIndex"
+    static final String INCIDENTS = "incidents"
+
 
     def index() {
         speechletService.doSpeechlet(request,response, this)
@@ -161,21 +164,22 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
 
     private resolveIncident(Session speechletSession) {
-        List<Map> incidents = speechletSession.getAttribute("incidents") as List<Map>
-        int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
+        List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
+        int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
 
         changeIncidentStatus("resolve",incidents[incidentIndex], speechletSession)
     }
 
     private ackIncident(Session speechletSession) {
-        List<Map> incidents = speechletSession.getAttribute("incidents") as List<Map>
-        int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
+        List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
+        int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
 
         changeIncidentStatus("ack",incidents[incidentIndex], speechletSession)
     }
 
     private nextIncident(Session speechletSession) {
-
+        int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
+        speechletSession.setAttribute(INCIDENT_INDEX, incidentIndex+1)
         sayIncident(speechletSession,false)
     }
 
@@ -309,8 +313,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         // send either 'ack' or 'resolve' on the status param
         if (status == "ack" && incident.currentPhase == "ACKED") {
             // say next incident
-            int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
-            speechletSession.setAttribute("incidentIndex",incidentIndex+1)
+            int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
+            speechletSession.setAttribute(INCIDENT_INDEX,incidentIndex+1)
             return sayIncident(speechletSession,false,"\n Incident is already acknowledged.\ns")
         }
         RESTClient client = new RESTClient("https://api.victorops.com/api-public/v1/incidents/${status}")
@@ -327,22 +331,22 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         String speechText = ""
 
         response.data.get("results").each { result ->
-            speechText += "Incident ${result.incidentNumber} set to ${status}"
+            speechText += "Incident ${result.incidentNumber} set to ${status}."
         }
         if (speechText.length() == 0) {
-            speechText += "There were no incidents to update"
+            speechText += "There were no incidents to update."
         }
         // say next incident
-        int incidentIndex = speechletSession.getAttribute("incidentIndex") as Integer
-        speechletSession.setAttribute("incidentIndex",++incidentIndex)
-        sayIncident(speechletSession,false)
+        int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
+        speechletSession.setAttribute(INCIDENT_INDEX,incidentIndex+1)
+        sayIncident(speechletSession,false,speechText)
 
     }
 
     SpeechletResponse sayIncident(Session speechletSession, Boolean sayCount = false, String speechText = "") {
 
-        int indicentIndex = speechletSession.getAttribute("incidentIndex") as Integer
-        List<Map> incidents = speechletSession.getAttribute("incidents") as List<Map>
+        int indicentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
+        List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
 
         if (sayCount) {
             speechText = "You have ${incidents.size()} incidents"
@@ -361,7 +365,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         } else {
             speechText += "Would you like to Acknowledge Resolve or go to next incident?"
         }
-        speechletSession.setAttribute("incidentIndex", indicentIndex+1)
+
 
         askResponse(speechText, speechText)
 
@@ -384,11 +388,10 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                 filteredIncidents.add(incident)
             }
         }
-        //speechText = "You have ${filteredIncidents.size()} incidents"
 
         if (filteredIncidents.size() > 0) {
-            speechletSession.setAttribute("incidents",filteredIncidents)
-            speechletSession.setAttribute("incidentIndex",0)
+            speechletSession.setAttribute(INCIDENTS,filteredIncidents)
+            speechletSession.setAttribute(INCIDENT_INDEX,0)
             sayIncident(speechletSession, true)
         } else {
             speechText = "You have no open incidents."
