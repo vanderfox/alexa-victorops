@@ -432,16 +432,19 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
      void getUsers() {
-        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/user')
-        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
-        client.defaultRequestHeaders.'Accept' = "application/json"
+
         def response = client.get()
-
-
+        RESTClient client = buildRestClient('https://api.victorops.com/api-public/v1/user')
         System.out.println(response)
     }
 
+    RESTClient buildRestClient(String url) {
+        RESTClient client = new RESTClient(url)
+        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'Accept' = "application/json"
+        client
+    }
 
 }
 
