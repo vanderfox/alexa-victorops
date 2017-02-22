@@ -300,10 +300,10 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         String speechText = ""
 
         response.data.get("results").each { result ->
-             speechText += "Incident ${result.incidentNumber} set to ${status}"
+             speechText += "Incident ${result.incidentNumber} set to ${status}\n"
         }
         if (speechText.length() == 0) {
-            speechText += "There were no incidents to update"
+            speechText += "There were no incidents to update.\n"
         }
         tellResponse(speechText,speechText)
     }
@@ -331,10 +331,10 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         String speechText = ""
 
         response.data.get("results").each { result ->
-            speechText += "Incident ${result.incidentNumber} set to ${status}."
+            speechText += "Incident ${result.incidentNumber} set to ${status}.\n"
         }
         if (speechText.length() == 0) {
-            speechText += "There were no incidents to update."
+            speechText += "There were no incidents to update.\n"
         }
         // say next incident
         int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
@@ -349,14 +349,14 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
 
         if (sayCount) {
-            speechText = "You have ${incidents.size()} incidents"
+            speechText += "You have ${incidents.size()} incidents"
 
         }
         DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
         def incident = incidents[indicentIndex]
         if (!incident) {
-            def s = "You have no more incidents."
-            return tellResponse(s,s)
+            speechText += "You have no more incidents."
+            return tellResponse(speechText,speechText)
         }
         ZonedDateTime zdt = ZonedDateTime.parse(incident.startTime, f)
         speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
@@ -405,9 +405,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
      * @return
      */
     SpeechletResponse getHelpResponse() {
-        String speechText = "Say something when the skill need help"
+        String speechText = "Say list incidents or acknowledge incidents for user or resolve incidents for user"
         // Create the Simple card content.
-        SimpleCard card = new SimpleCard(title:"YourHelpCardTitle",
+        SimpleCard card = new SimpleCard(title:"VictorOPS Help",
                 content:speechText)
         // Create the plain text output.
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
