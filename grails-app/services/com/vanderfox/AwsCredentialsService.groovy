@@ -26,10 +26,10 @@ class AwsCredentialsService {
     }
 
     @Transactional
-    void markOthersInactive(AwsCredentials twitterCredentials, User currentUser) {
+    void markOthersInactive(ApiCredentials twitterCredentials, User currentUser) {
         if (twitterCredentials.active) {
             // turn off active on all others
-            def otherCreds = AwsCredentials.findAllByUserAndActive(currentUser, true)
+            def otherCreds = ApiCredentials.findAllByUserAndActive(currentUser, true)
             if (otherCreds?.size() > 0) {
                 otherCreds.each { cred ->
                     cred.active = false
@@ -39,7 +39,7 @@ class AwsCredentialsService {
         }
     }
 
-    AwsCredentials getCredentialsForUser(User user) {
-        return AwsCredentials.findByUser(user)
+    ApiCredentials getCredentialsForUser(User user) {
+        return ApiCredentials.findByUser(user)
     }
 }

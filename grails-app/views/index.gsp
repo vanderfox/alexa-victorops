@@ -81,13 +81,13 @@
         <a href="#page-body" class="skip"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
         <div id="page-body" role="main">
             <h1>Welcome to Alexa VictorOPS Control</h1>
-            <p>Create an account here and link an API key to your account via the AwsCredentials so the assistant can help you! You can only have one active set of credentials at a time. Toggle them via the active flag.
+            <p>Create an account here and link an API key and API ID to your account via the the assistant can help you! You can only have one active set of credentials at a time. Toggle them via the active flag.
 
             </p>
 
             <ul>
                 <sec:ifLoggedIn><li><a href="${g.createLink(absolute: true,uri:'/user/edit')}">Edit user profile</a></li></sec:ifLoggedIn>
-                <sec:ifLoggedIn><li><a href="${g.createLink(absolute: true,uri:'/awsCredentials/index')}">Link AWS Credentials</a></li></sec:ifLoggedIn>
+                <sec:ifLoggedIn><li><a href="${g.createLink(absolute: true,uri:'/apiCredentials/index')}">Link VictorOPS API</a></li></sec:ifLoggedIn>
             </ul>
         </div>
     </body>

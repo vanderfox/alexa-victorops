@@ -20,7 +20,7 @@
     </head>
     <body>
         <div id="container">
-            <div class="banner" id="grailsLogo"><asset:image src="grails_logo.png" alt="Grails"/></div>
+            <div class="banner" id="victorOPSLogo"><asset:image src="victorops_logo.png" alt="VictorOPS"/></div>
             <sec:ifLoggedIn>
             <div class="logout" id="login"><a href="${g.createLink(absolute: true,uri:'/logout/index')}">Logout</a></div>
             </sec:ifLoggedIn>

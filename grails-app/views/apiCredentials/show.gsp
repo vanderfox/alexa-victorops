@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'awsCredentials.label', default: 'AwsCredentials')}" />
+        <g:set var="entityName" value="${message(code: 'apiCredentials.label', default: 'ApiCredentials')}" />
         <title><g:message code="default.show.label" args="[entityName]" /></title>
     </head>
     <body>
@@ -19,7 +19,7 @@
             <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
             </g:if>
-            <f:display bean="awsCredentials" />
+            <f:display bean="apiCredentials" />
             <g:form resource="${this.awsCredentials}" method="DELETE">
                 <fieldset class="buttons">
                     <g:link class="edit" action="edit" resource="${this.awsCredentials}"><g:message code="default.button.edit.label" default="Edit" /></g:link>

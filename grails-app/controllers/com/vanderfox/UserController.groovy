@@ -11,6 +11,9 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
     def springSecurityUiService
 
 
+
+
+
     @Override
     def create() {
         return super.create()
@@ -24,6 +27,24 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
     @Override
     @Secured(['ROLE_USER'])
     def edit() {
+        if (!params.id) {
+            User currentUser = springSecurityService.currentUser
+            params.put("id",currentUser.id.toString())
+        } else {
+            User currentUser = springSecurityService.currentUser
+            if (currentUser.id != params.id && !SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
+
+                return super.edit()
+            }
+
+        }
+        return super.edit()
+    }
+
+
+
+    @Secured(['ROLE_USER'])
+    def show() {
         if (!params.id) {
             User currentUser = springSecurityService.currentUser
             params.put("id",currentUser.id.toString())

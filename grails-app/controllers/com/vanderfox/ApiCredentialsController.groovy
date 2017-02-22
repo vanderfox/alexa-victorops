@@ -1,11 +1,12 @@
 package com.vanderfox
 
+import grails.orm.PagedResultList
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.springframework.http.HttpStatus
 
 @Transactional(readOnly = true)
-class AwsCredentialsController {
+class ApiCredentialsController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
     def springSecurityService
@@ -17,13 +18,13 @@ class AwsCredentialsController {
         User currentUser = springSecurityService.currentUser
         currentUser = User.findByUsername(currentUser.username)
         //params.put("user",currentUser)
-        def awsCriteria = AwsCredentials.createCriteria()
-        def listOfUsers = awsCriteria.list(params) { eq('user', currentUser) }
-        respond listOfUsers, model:[awsCredentialsCount: awsCriteria.count()]
+        def awsCriteria = ApiCredentials.createCriteria()
+        PagedResultList listOfUsers = awsCriteria.list(params) { eq('user', currentUser) }
+        respond listOfUsers, model:[apiCredentialsCount: listOfUsers.size(),apiCredentialsList:listOfUsers]
     }
 
     @Secured(['ROLE_USER'])
-    def show(AwsCredentials awsCredentials) {
+    def show(ApiCredentials awsCredentials) {
         User currentUser = springSecurityService.currentUser
         if (awsCredentials.user != currentUser) {
             render status: HttpStatus.UNAUTHORIZED
@@ -34,12 +35,12 @@ class AwsCredentialsController {
 
     @Secured(['ROLE_USER'])
     def create() {
-        respond new AwsCredentials(params)
+        respond new ApiCredentials(params)
     }
 
     @Transactional
     @Secured(['ROLE_USER'])
-    def save(AwsCredentials awsCredentials) {
+    def save(ApiCredentials awsCredentials) {
         if (awsCredentials == null) {
             transactionStatus.setRollbackOnly()
             notFound()
@@ -59,7 +60,7 @@ class AwsCredentialsController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'awsCredentials.label', default: 'AwsCredentials'), awsCredentials.id])
+                flash.message = message(code: 'default.created.message', args: [message(code: 'apiCredentials.label', default: 'ApiCredentials'), awsCredentials.id])
                 redirect awsCredentials
             }
             '*' { respond awsCredentials, [status: HttpStatus.CREATED] }
@@ -69,13 +70,13 @@ class AwsCredentialsController {
 
 
     @Secured(['ROLE_USER'])
-    def edit(AwsCredentials awsCredentials) {
+    def edit() {
+        ApiCredentials awsCredentials = ApiCredentials.get(params.id)
         respond awsCredentials
     }
-
     @Transactional
     @Secured(['ROLE_USER'])
-    def update(AwsCredentials awsCredentials) {
+    def update(ApiCredentials awsCredentials) {
         if (awsCredentials == null) {
             transactionStatus.setRollbackOnly()
             notFound()
@@ -96,7 +97,7 @@ class AwsCredentialsController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'awsCredentials.label', default: 'AwsCredentials'), awsCredentials.id])
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'apiCredentials.label', default: 'ApiCredentials'), awsCredentials.id])
                 redirect awsCredentials
             }
             '*'{ respond awsCredentials, [status: HttpStatus.OK] }
@@ -105,7 +106,7 @@ class AwsCredentialsController {
 
     @Transactional
     @Secured(['ROLE_ADMIN'])
-    def delete(AwsCredentials awsCredentials) {
+    def delete(ApiCredentials awsCredentials) {
 
         if (awsCredentials == null) {
             transactionStatus.setRollbackOnly()
@@ -117,7 +118,7 @@ class AwsCredentialsController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'awsCredentials.label', default: 'AwsCredentials'), awsCredentials.id])
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'apiCredentials.label', default: 'ApiCredentials'), awsCredentials.id])
                 redirect action:"index", method:"GET"
             }
             '*'{ render status: HttpStatus.NO_CONTENT }
@@ -127,7 +128,7 @@ class AwsCredentialsController {
     protected void notFound() {
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'awsCredentials.label', default: 'AwsCredentials'), params.id])
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'apiCredentials.label', default: 'ApiCredentials'), params.id])
                 redirect action: "index", method: "GET"
             }
             '*'{ render status: HttpStatus.NOT_FOUND }

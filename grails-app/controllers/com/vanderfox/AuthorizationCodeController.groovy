@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus
 @Transactional(readOnly = true)
 class AuthorizationCodeController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", edit: "POST"]
 
     @Secured (["ROLE_ADMIN"])
     def index(Integer max) {

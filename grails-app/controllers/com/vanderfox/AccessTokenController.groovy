@@ -46,7 +46,7 @@ class AccessTokenController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'accessToken.label', default: 'AccessToken'), accessToken.id])
+                flash.message = message(code: 'default.created.message', args: [message(code: 'apiId.label', default: 'AccessToken'), accessToken.id])
                 redirect accessToken
             }
             '*' { respond accessToken, [status: HttpStatus.CREATED] }
@@ -77,7 +77,7 @@ class AccessTokenController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'accessToken.label', default: 'AccessToken'), accessToken.id])
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'apiId.label', default: 'AccessToken'), accessToken.id])
                 redirect accessToken
             }
             '*'{ respond accessToken, [status: HttpStatus.OK] }
@@ -98,7 +98,7 @@ class AccessTokenController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'accessToken.label', default: 'AccessToken'), accessToken.id])
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'apiId.label', default: 'AccessToken'), accessToken.id])
                 redirect action:"index", method:"GET"
             }
             '*'{ render status: HttpStatus.NO_CONTENT }
@@ -108,7 +108,7 @@ class AccessTokenController {
     protected void notFound() {
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'accessToken.label', default: 'AccessToken'), params.id])
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'apiId.label', default: 'AccessToken'), params.id])
                 redirect action: "index", method: "GET"
             }
             '*'{ render status: HttpStatus.NOT_FOUND }

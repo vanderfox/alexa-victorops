@@ -20,6 +20,7 @@ import com.amazon.speech.speechlet.PlaybackStartedRequest
 import com.amazon.speech.speechlet.PlaybackStoppedRequest
 import com.amazon.speech.speechlet.SystemExceptionEncounteredRequest
 import com.amazon.speech.speechlet.Speechlet
+import com.amazon.speech.ui.SsmlOutputSpeech
 import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
 import grails.web.Controller
@@ -186,7 +187,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     private SpeechletResponse askResponse(String cardText, String speechText) {
         // Create the Simple card content.
         SimpleCard card = new SimpleCard()
-        card.setTitle("DevOps Assistant")
+        card.setTitle("VictorOPS")
         card.setContent(cardText)
 
         // Create the plain text output.
@@ -198,6 +199,47 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         reprompt.setOutputSpeech(speech)
 
         SpeechletResponse.newAskResponse(speech, reprompt, card)
+    }
+
+
+    private SpeechletResponse askResponseFancy(String cardText, String speechText) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard()
+        card.setTitle("VictorOPS")
+        card.setContent(cardText)
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
+        log.info("making ssml")
+        SsmlOutputSpeech fancySpeech = new SsmlOutputSpeech()
+        fancySpeech.ssml = speechText
+        log.info("finished ssml")
+        // Create reprompt
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(fancySpeech)
+
+        SpeechletResponse.newAskResponse(fancySpeech, reprompt, card)
+    }
+
+    private SpeechletResponse tellResponseFancy(String cardText, String speechText) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard()
+        card.setTitle("VictorOPS")
+        card.setContent(cardText)
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
+        log.info("making ssml")
+        SsmlOutputSpeech fancySpeech = new SsmlOutputSpeech()
+        fancySpeech.ssml = speechText
+        log.info("finished ssml")
+        // Create reprompt
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(fancySpeech)
+
+        SpeechletResponse.newTellResponse(fancySpeech, card)
     }
 
     private SpeechletResponse tellResponse(String cardText, String speechText) {
@@ -223,8 +265,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     private SpeechletResponse didNotUnderstand() {
-        String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said.  Say list open incidents to list open incidents</speak>"
-        askResponse(speechText, speechText)
+        String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said. Say list incidents or acknowledge incidents for user or resolve incidents for user</speak>"
+        askResponseFancy(speechText, speechText)
     }
     /**
      * Grails config is injected here for configuration of your speechlet

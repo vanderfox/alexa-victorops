@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'accessToken.label', default: 'AccessToken')}" />
+        <g:set var="entityName" value="${message(code: 'apiId.label', default: 'AccessToken')}" />
         <title><g:message code="default.show.label" args="[entityName]" /></title>
     </head>
     <body>

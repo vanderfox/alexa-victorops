@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'awsCredentials.label', default: 'AwsCredentials')}" />
+        <g:set var="entityName" value="${message(code: 'apiCredentials.label', default: 'ApiCredentials')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
     </head>
     <body>
@@ -18,10 +18,10 @@
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
-            <f:table properties="['id','accessToken','active']" collection="${awsCredentialsList}" domainClass="com.vanderfox.AwsCredentials"/>
+            <f:table properties="['id','apiId','active']" collection="${apiCredentialsList}" domainClass="com.vanderfox.ApiCredentials"/>
 
             <div class="pagination">
-                <g:paginate total="${awsCredentialsCount ?: 0}" />
+                <g:paginate total="${apiCredentialsCount ?: 0}" />
             </div>
         </div>
     </body>
