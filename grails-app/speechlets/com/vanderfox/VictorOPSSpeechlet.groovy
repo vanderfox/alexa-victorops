@@ -41,6 +41,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     Config grailsConfig
     def speechletService
+    def apiCredentialsService
 
     static final String INCIDENT_INDEX = "incidentIndex"
     static final String INCIDENTS = "incidents"
@@ -141,12 +142,12 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             case "ResolveIncidentsForUser":
                 Slot incidentNumber = request.intent.getSlot("username")
                 log.debug("incident number:"+incidentNumber.value)
-                   changeIncidentStatus(incidentNumber.value,"resolve")
+                   changeIncidentStatus(incidentNumber.value,"resolve",session)
                 break
             case "AckIncidentsForUser":
                 Slot incidentNumber = request.intent.getSlot("username")
                 log.debug("incident number:"+incidentNumber.value)
-                changeIncidentStatus(incidentNumber.value,"ack")
+                changeIncidentStatus(incidentNumber.value,"ack",session)
                 break
             case "AMAZON.StopIntent":
             case "AMAZON.CancelIntent":
@@ -305,11 +306,12 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
 
-    SpeechletResponse whoIsOnCall() {
+    SpeechletResponse whoIsOnCall(Session speechletSession) {
+        ApiCredentials apiCredentials = getApiCredentials(speechletSession)
 
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
-        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'X-VO-Api-Id' = apiCredentials.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = apiCredentials.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
         log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
         def response = client.get(path:'incidents')
@@ -325,14 +327,15 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
 
-    SpeechletResponse changeIncidentStatus(String username, String status) {
+    SpeechletResponse changeIncidentStatus(String username, String status, Session speechletSession) {
 
+        ApiCredentials userCredentials = getApiCredentials(speechletSession)
         // send either 'ack' or 'resolve' on the status param
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/incidents/byUser/')
-        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'X-VO-Api-Id' = userCredentials.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = userCredentials.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
-        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
+        log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         def postBody = [userName: username, message: 'updatedbyAlexaSkill'] // will be url-encoded
 
         def response = client.patch(path:status,body: postBody, requestContentType: JSON)
@@ -352,6 +355,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     SpeechletResponse changeIncidentStatus(String status, Map incident, Session speechletSession) {
 
+        ApiCredentials apiCredentials = getApiCredentials(speechletSession)
         // send either 'ack' or 'resolve' on the status param
         if (status == "ack" && incident.currentPhase == "ACKED") {
             // say next incident
@@ -360,10 +364,10 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             return sayIncident(speechletSession,false,"\n Incident is already acknowledged.\ns")
         }
         RESTClient client = new RESTClient("https://api.victorops.com/api-public/v1/incidents/${status}")
-        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'X-VO-Api-Id' = apiCredentials.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' =apiCredentials.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
-        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
+        log.debug("Using API id:${apiCredentials.apiId} apiKey: ${apiCredentials.apiKey}")
         def postBody = [userName: grailsApplication.config.victorOPS.userName, incidentNames: [incident.incidentNumber], message: 'updatedbyAlexaSkill'] // will be url-encoded
 
         def response = client.patch(path:status,body: postBody, requestContentType: JSON)
@@ -412,14 +416,35 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         askResponse(speechText, speechText)
 
     }
+
+    ApiCredentials getApiCredentials(Session speechletSession) {
+        ApiCredentials userCredentials = null
+
+        if (speechletSession?.user?.accessToken) {
+            log.debug("Looking up user for access token ${speechletSession.user.accessToken}")
+            User awsUser = apiCredentialsService.getUserForAccessToken(speechletSession.user.accessToken)
+            if (awsUser) {
+                log.debug("Looking up credentials for user u:${awsUser.username} id:${awsUser.id} and for access token ${speechletSession.user.accessToken}")
+                userCredentials = ApiCredentials.findByUserAndActive(awsUser,true)
+
+            } else {
+                log.error("Unable to find user for access token ${speechletSession.user.accessToken}")
+            }
+            return userCredentials
+
+        }
+    }
     SpeechletResponse getOpenIncidents(Session speechletSession) {
 
+        ApiCredentials userCredentials = getApiCredentials(speechletSession)
 
+
+        log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
-        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'X-VO-Api-Id' = userCredentials.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = userCredentials.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
-        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
+
         def response = client.get(path:'incidents')
         log.debug("Got incidents")
 
@@ -483,10 +508,10 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         System.out.println(response)
     }
 
-    RESTClient buildRestClient(String url) {
+    RESTClient buildRestClient(String url, ApiCredentials userCredentials) {
         RESTClient client = new RESTClient(url)
-        client.defaultRequestHeaders.'X-VO-Api-Id' = grailsApplication.config.victorOPS.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = grailsApplication.config.victorOPS.apiKey
+        client.defaultRequestHeaders.'X-VO-Api-Id' = userCredentials.apiId
+        client.defaultRequestHeaders.'X-VO-Api-Key' = userCredentials.apiKey
         client.defaultRequestHeaders.'Accept' = "application/json"
         client
     }
