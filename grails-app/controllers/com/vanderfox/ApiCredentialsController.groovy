@@ -24,12 +24,12 @@ class ApiCredentialsController {
     }
 
     @Secured(['ROLE_USER'])
-    def show(ApiCredentials awsCredentials) {
+    def show(ApiCredentials apiCredentials) {
         User currentUser = springSecurityService.currentUser
-        if (awsCredentials.user != currentUser) {
+        if (apiCredentials.user != currentUser) {
             render status: HttpStatus.UNAUTHORIZED
         } else {
-            respond awsCredentials
+            respond apiCredentials
         }
     }
 
@@ -70,37 +70,37 @@ class ApiCredentialsController {
 
 
     @Secured(['ROLE_USER'])
-    def edit() {
-        ApiCredentials awsCredentials = ApiCredentials.get(params.id)
-        respond awsCredentials
+    def edit(ApiCredentials apiCredentials) {
+        //ApiCredentials apiCredentials = ApiCredentials.get(params.id)
+        respond apiCredentials
     }
     @Transactional
     @Secured(['ROLE_USER'])
-    def update(ApiCredentials awsCredentials) {
-        if (awsCredentials == null) {
+    def update(ApiCredentials apiCredentials) {
+        if (apiCredentials == null) {
             transactionStatus.setRollbackOnly()
             notFound()
             return
         }
 
-        if (awsCredentials.hasErrors()) {
+        if (apiCredentials.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond awsCredentials.errors, view:'edit'
+            respond apiCredentials.errors, view:'edit'
             return
         }
         User currentUser = springSecurityService.currentUser
-        awsCredentialsService.markOthersInactive(awsCredentials, currentUser)
-        awsCredentials.active = true
-        if (awsCredentials.user == currentUser) {
-            awsCredentials.save flush: true
+        awsCredentialsService.markOthersInactive(apiCredentials, currentUser)
+        apiCredentials.active = true
+        if (apiCredentials.user == currentUser) {
+            apiCredentials.save flush: true
         }
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'apiCredentials.label', default: 'ApiCredentials'), awsCredentials.id])
-                redirect awsCredentials
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'apiCredentials.label', default: 'ApiCredentials'), apiCredentials.id])
+                redirect apiCredentials
             }
-            '*'{ respond awsCredentials, [status: HttpStatus.OK] }
+            '*'{ respond apiCredentials, [status: HttpStatus.OK] }
         }
     }
 

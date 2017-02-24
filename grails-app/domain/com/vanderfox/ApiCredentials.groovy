@@ -14,5 +14,6 @@ class ApiCredentials {
     String apiKey
     String username
     Boolean active = true
+    int id
 
 }
