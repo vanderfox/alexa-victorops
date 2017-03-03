@@ -10,7 +10,7 @@ class ApiCredentialsController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
     def springSecurityService
-    def awsCredentialsService
+    def apiCredentialsService
 
     @Secured(['ROLE_USER'])
     def index(Integer max) {
@@ -49,7 +49,7 @@ class ApiCredentialsController {
 
         User currentUser = springSecurityService.currentUser
         awsCredentials.user = currentUser
-        awsCredentialsService.markOthersInactive(awsCredentials, currentUser)
+        apiCredentialsService.markOthersInactive(awsCredentials, currentUser)
         awsCredentials.active = true
         awsCredentials.save flush:true
         if (awsCredentials.hasErrors()) {
@@ -89,7 +89,7 @@ class ApiCredentialsController {
             return
         }
         User currentUser = springSecurityService.currentUser
-        awsCredentialsService.markOthersInactive(apiCredentials, currentUser)
+        apiCredentialsService.markOthersInactive(apiCredentials, currentUser)
         apiCredentials.active = true
         if (apiCredentials.user == currentUser) {
             apiCredentials.save flush: true

@@ -5,7 +5,7 @@ import grails.transaction.Transactional
 import org.springframework.security.oauth2.provider.*
 
 class CustomGormClientDetailsService extends GormClientDetailsService {
-    @Transactional(readOnly = true)
+    @Transactional
     ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
         super.loadClientByClientId(clientId)
     }

@@ -76,10 +76,13 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
 
         }
         if (!SpringSecurityUtils.ifAllGranted("ROLE_ADMIN")) {
-            // they can only update password
+            // they can only update password and email
             HashMap restrictedProperties = new HashMap()
             if (params.password) {
                 restrictedProperties.put("password",params.password)
+            }
+            if (params.email) {
+                restrictedProperties.put("email",params.email)
             }
             springSecurityUiService.updateUser(restrictedProperties,currentUser)
             flash.message = "Password successfully changed"

@@ -25,6 +25,10 @@
                 <span id="username-label" class="property-label">Username</span>
                 <div class="property-value" aria-labelledby="username-label"><f:display bean="user" property="username"/></div>
             </li>
+            <li class="fieldcontain">
+                <span id="username-label" class="property-label">Email</span>
+                <div class="property-value" aria-labelledby="username-label"><f:display bean="user" property="email"/></div>
+            </li>
 
             <li class="fieldcontain">
                 <span id="accountLocked-label" class="property-label">Account Locked</span>

@@ -308,6 +308,10 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     SpeechletResponse whoIsOnCall(Session speechletSession) {
         ApiCredentials apiCredentials = getApiCredentials(speechletSession)
+        if (!apiCredentials) {
+            return createLinkCard(speechletSession)
+        }
+
 
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
         client.defaultRequestHeaders.'X-VO-Api-Id' = apiCredentials.apiId
@@ -330,6 +334,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     SpeechletResponse changeIncidentStatus(String username, String status, Session speechletSession) {
 
         ApiCredentials userCredentials = getApiCredentials(speechletSession)
+        if (!userCredentials) {
+            return createLinkCard(speechletSession)
+        }
         // send either 'ack' or 'resolve' on the status param
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/incidents/byUser/')
         client.defaultRequestHeaders.'X-VO-Api-Id' = userCredentials.apiId
@@ -356,6 +363,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     SpeechletResponse changeIncidentStatus(String status, Map incident, Session speechletSession) {
 
         ApiCredentials apiCredentials = getApiCredentials(speechletSession)
+        if (!apiCredentials) {
+            return createLinkCard(speechletSession)
+        }
         // send either 'ack' or 'resolve' on the status param
         if (status == "ack" && incident.currentPhase == "ACKED") {
             // say next incident
@@ -437,6 +447,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     SpeechletResponse getOpenIncidents(Session speechletSession) {
 
         ApiCredentials userCredentials = getApiCredentials(speechletSession)
+        if (!userCredentials) {
+            return createLinkCard(speechletSession)
+        }
 
 
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
@@ -490,7 +503,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
      */
     SpeechletResponse createLinkCard(Session session) {
 
-        String speechText = "Please use the alexa app to link account."
+        String speechText = "I see you have not linked your account. Please use the alexa app to link your account and enter your API credentials."
         // Create the Simple card content.
         LinkAccountCard card = new LinkAccountCard()
         // Create the plain text output.

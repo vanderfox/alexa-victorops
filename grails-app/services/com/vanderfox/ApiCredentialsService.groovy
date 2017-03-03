@@ -3,7 +3,7 @@ package com.vanderfox
 import grails.transaction.Transactional
 
 
-class AwsCredentialsService {
+class ApiCredentialsService {
 
     def serviceMethod() {
 
