@@ -50,6 +50,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     static final String INCIDENT_INDEX = "incidentIndex"
     static final String INCIDENTS = "incidents"
+    static final String TEAMS = "teams"
+    static final String TEAM_INDEX = "teamIndex"
 
 
     def index() {
@@ -153,6 +155,16 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                 Slot incidentNumber = request.intent.getSlot("username")
                 log.debug("incident number:"+incidentNumber.value)
                 changeIncidentStatus(incidentNumber.value,"ack",session)
+                break
+            case "ListTeams":
+                listTeams(session)
+                break
+            case "NextTeam":
+                nextTeam(session)
+                break
+            case "SayTeamOnCallSchedule":
+                int teamIndex = session.getAttribute(TEAM_INDEX) as Integer
+                sayTeamOncallSchedule(teamIndex,session)
                 break
             case "AMAZON.StopIntent":
             case "AMAZON.CancelIntent":
@@ -589,6 +601,84 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         def response = client.get()
         RESTClient client = buildRestClient('https://api.victorops.com/api-public/v1/user')
         System.out.println(response)
+    }
+
+
+    SpeechletResponse listTeams(Session session, int startIndex = 0) {
+        ApiCredentials userCredentials = getApiCredentials(session)
+        if (!userCredentials) {
+            return createLinkCard(session)
+        }
+
+
+        log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
+        RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/",userCredentials)
+
+        def response = client.get(path:'team')
+        log.debug("Got teams")
+
+        String speechText = ""
+        int teamcount = response.data.size()
+        if (startIndex > 0) {
+            speechText = "You have ${teamcount} teams.\n"
+        }
+
+        session.setAttribute(TEAMS,response.data)
+        session.setAttribute(TEAM_INDEX,startIndex as String)
+        if (teamcount > 0 && startIndex <= teamcount) {
+            speechText += "Team ${response.data[startIndex].name} - would you like to hear their on-call schedule?"
+            askResponse(speechText,speechText)
+        } else {
+            speechText += "You have no teams configured."
+            tellResponse(speechText,speechText)
+        }
+
+
+    }
+
+
+    SpeechletResponse nextTeam(Session session) {
+        int teamIndex = session.getAttribute(TEAM_INDEX) as Integer
+        teamIndex++
+        listTeams(session, teamIndex)
+
+    }
+
+    SpeechletResponse sayTeamOncallSchedule(int teamIndex, Session session) {
+        ApiCredentials userCredentials = getApiCredentials(session)
+        if (!userCredentials) {
+            return createLinkCard(session)
+        }
+
+        log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
+        List teams = session.getAttribute(TEAMS)
+        RESTClient client = buildRestClient("GET /api-public/v1/team/${teams[teamIndex]}/oncall/",userCredentials)
+
+        def response = client.get(path:'schedule')
+        log.debug("Got teams")
+
+        String speechText = ""
+
+        if (teams[teamIndex] && response.data.team) {
+            speechText += "Team ${response.data.team} - on call schedule:\n"
+            speechText += "Rotation ${response.data.schedule.rotationName} Shift ${response.data.schedule.shiftName}\n"
+            response.data.schedule.rolls.each { roll ->
+                speechText += "User ${roll.onCall} is on call between ${roll.change} until ${roll.util}\n"
+            }
+
+            speechText +" say next team or yes to go to the next team."
+            if (teamIndex <= teams.size()) {
+                askResponse(speechText, speechText)
+            } else {
+                speechText += "There are no more teams."
+                tellResponse(speechText,speechText)
+            }
+        } else {
+            speechText += "Unable to retrieve on call schedule for team ${teams[teamIndex].name}."
+            tellResponse(speechText,speechText)
+        }
+
+
     }
 
     RESTClient buildRestClient(String url, ApiCredentials userCredentials) {

@@ -31,6 +31,15 @@
             "intent": "NextIncident"
         },
         {
+            "intent": "NextTeam"
+        },
+        {
+            "intent": "ListTeams"
+        },
+        {
+            "intent": "SayTeamOnCallSchedule"
+        },
+        {
             "intent": "AMAZON.HelpIntent"
         },
         {

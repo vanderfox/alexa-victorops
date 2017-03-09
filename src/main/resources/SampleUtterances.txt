@@ -8,6 +8,12 @@ AckIncident Acknowledge incident
 ResolveIncident Acknowledge incident
 NextIncident Next
 NextIncident Next incident
+ListTeams List Teams
+ListTeams Teams
+NextTeam next team
+SayTeamOnCallSchedule yes
+SayTeamOnCallSchedule schedule
+SayTeamOnCallSchedule team schedule
 AMAZON.StopIntent stop
 AMAZON.StopIntent quit
 AMAZON.CancelIntent cancel
