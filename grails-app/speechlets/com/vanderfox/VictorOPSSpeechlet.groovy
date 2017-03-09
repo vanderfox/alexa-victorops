@@ -390,6 +390,22 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         table.putItem(newItem)
     }
 
+    private void incrementListTeamsMetrics() {
+        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
+        Table table = dynamoDB.getTable("VictorOpsMetrics");
+        Item item = table.getItem("id", 4);
+        int usedCount = 0;
+        if (item != null) {
+            usedCount = item.getInt("used")
+        }
+        usedCount++
+        Item newItem = new Item()
+        newItem.withInt("id", 4)
+        newItem.withString("metric", "ListTeams")
+        newItem.withInt("used", usedCount)
+        table.putItem(newItem)
+    }
+
 
 
     SpeechletResponse whoIsOnCall(Session speechletSession) {
@@ -614,7 +630,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             return createLinkCard(session)
         }
 
-
+        incrementListTeamsMetrics()
+        
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/",userCredentials)
 
