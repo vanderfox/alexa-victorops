@@ -11,6 +11,7 @@ NextIncident Next incident
 ListTeams List Teams
 ListTeams Teams
 NextTeam next team
+NextTeam no
 SayTeamOnCallSchedule yes
 SayTeamOnCallSchedule schedule
 SayTeamOnCallSchedule team schedule

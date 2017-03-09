@@ -283,7 +283,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     private SpeechletResponse didNotUnderstand() {
-        String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said. Say list incidents or acknowledge incidents for user or resolve incidents for user</speak>"
+        String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said. Say list incidents or acknowledge incidents for user or resolve incidents for user or list teams</speak>"
         askResponseFancy(speechText, speechText)
     }
     /**
@@ -308,7 +308,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     SpeechletResponse getWelcomeResponse()  {
-        String speechText = "Welcome to the victorops skill - say List Open Incidents for open incidents"
+        String speechText = "Welcome to the victorops skill - say List Open Incidents for open incidents or list teams"
 
         // Create the Simple card content.
         SimpleCard card = new SimpleCard(title: "VictorOPS", content: speechText)
@@ -656,12 +656,13 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         List teams = session.getAttribute(TEAMS)
-        RESTClient client = buildRestClient("GET /api-public/v1/team/${teams[teamIndex].slug}/oncall/",userCredentials)
+        RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/team/${teams[teamIndex].slug}/oncall/",userCredentials)
 
-        def response = client.get(path:'schedule',args:['daysForward','7'])
-        log.debug("Got teams")
+        def response = client.get(path:'schedule',query:['daysForward':'7'])
+        log.debug("Got teams using index:${teamIndex}")
 
         String speechText = ""
+        teamIndex--
 
         if (teams[teamIndex] && response.data.team) {
             speechText += "Team ${response.data.team} - on call schedule:\n"
