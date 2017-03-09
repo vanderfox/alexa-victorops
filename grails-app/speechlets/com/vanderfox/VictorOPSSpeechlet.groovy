@@ -337,6 +337,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         usedCount++
         Item newItem = new Item()
         newItem.withInt("id", 0)
+        newItem.withString("metric", "Login")
         newItem.withInt("used", usedCount)
         table.putItem(newItem)
     }
@@ -352,6 +353,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         usedCount++
         Item newItem = new Item()
         newItem.withInt("id", 1)
+        newItem.withString("metric", "AcknowledgeIncident")
         newItem.withInt("used", usedCount)
         table.putItem(newItem)
     }
@@ -367,6 +369,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         usedCount++
         Item newItem = new Item()
         newItem.withInt("id", 2)
+        newItem.withString("metric", "ResolveIncident")
         newItem.withInt("used", usedCount)
         table.putItem(newItem)
     }
@@ -382,6 +385,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         usedCount++
         Item newItem = new Item()
         newItem.withInt("id", 3)
+        newItem.withString("metric", "ListIncidents")
         newItem.withInt("used", usedCount)
         table.putItem(newItem)
     }
