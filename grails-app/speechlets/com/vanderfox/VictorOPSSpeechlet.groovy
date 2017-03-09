@@ -21,6 +21,11 @@ import com.amazon.speech.speechlet.PlaybackStoppedRequest
 import com.amazon.speech.speechlet.SystemExceptionEncounteredRequest
 import com.amazon.speech.speechlet.Speechlet
 import com.amazon.speech.ui.SsmlOutputSpeech
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
+import com.amazonaws.services.dynamodbv2.document.DynamoDB
+import com.amazonaws.services.dynamodbv2.document.Item
+import com.amazonaws.services.dynamodbv2.document.Table
 import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
 import grails.web.Controller
@@ -168,14 +173,14 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     private resolveIncident(Session speechletSession) {
         List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
         int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
-
+        incrementResolveIncidentMetrics
         changeIncidentStatus("resolve",incidents[incidentIndex], speechletSession)
     }
 
     private ackIncident(Session speechletSession) {
         List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
         int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
-
+        incrementAcknowledgeIncidentMetrics
         changeIncidentStatus("ack",incidents[incidentIndex], speechletSession)
     }
 
@@ -299,11 +304,76 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         // Create the plain text output.
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
 
+        incrementLoginMetrics()
+
         // Create reprompt
         Reprompt reprompt = new Reprompt(outputSpeech: speech)
 
+
+
         SpeechletResponse.newAskResponse(speech, reprompt, card)
     }
+
+    private void incrementLoginMetrics() {
+        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
+        Table table = dynamoDB.getTable("VictorOpsMetrics");
+        Item item = table.getItem("id", 0);
+        int usedCount = 0;
+        if (item != null) {
+            usedCount = item.getInt("used")
+        }
+        usedCount++
+        Item newItem = new Item()
+        newItem.withInt("id", 0)
+        newItem.withInt("used", usedCount)
+        table.putItem(newItem)
+    }
+
+    private void incrementAcknowledgeIncidentMetrics() {
+        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
+        Table table = dynamoDB.getTable("VictorOpsMetrics");
+        Item item = table.getItem("id", 1);
+        int usedCount = 0;
+        if (item != null) {
+            usedCount = item.getInt("used")
+        }
+        usedCount++
+        Item newItem = new Item()
+        newItem.withInt("id", 1)
+        newItem.withInt("used", usedCount)
+        table.putItem(newItem)
+    }
+
+    private void incrementResolveIncidentMetrics() {
+        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
+        Table table = dynamoDB.getTable("VictorOpsMetrics");
+        Item item = table.getItem("id", 2);
+        int usedCount = 0;
+        if (item != null) {
+            usedCount = item.getInt("used")
+        }
+        usedCount++
+        Item newItem = new Item()
+        newItem.withInt("id", 2)
+        newItem.withInt("used", usedCount)
+        table.putItem(newItem)
+    }
+
+    private void incrementListIncidentMetrics() {
+        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
+        Table table = dynamoDB.getTable("VictorOpsMetrics");
+        Item item = table.getItem("id", 3);
+        int usedCount = 0;
+        if (item != null) {
+            usedCount = item.getInt("used")
+        }
+        usedCount++
+        Item newItem = new Item()
+        newItem.withInt("id", 3)
+        newItem.withInt("used", usedCount)
+        table.putItem(newItem)
+    }
+
 
 
     SpeechletResponse whoIsOnCall(Session speechletSession) {
@@ -450,7 +520,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         if (!userCredentials) {
             return createLinkCard(speechletSession)
         }
-
+        incrementListIncidentMetrics()
 
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
