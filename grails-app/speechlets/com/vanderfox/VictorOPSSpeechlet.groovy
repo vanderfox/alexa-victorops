@@ -656,9 +656,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         List teams = session.getAttribute(TEAMS)
-        RESTClient client = buildRestClient("GET /api-public/v1/team/${teams[teamIndex]}/oncall/",userCredentials)
+        RESTClient client = buildRestClient("GET /api-public/v1/team/${teams[teamIndex].slug}/oncall/",userCredentials)
 
-        def response = client.get(path:'schedule')
+        def response = client.get(path:'schedule',args:['daysForward','7'])
         log.debug("Got teams")
 
         String speechText = ""
