@@ -185,14 +185,14 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     private resolveIncident(Session speechletSession) {
         List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
         int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
-        incrementResolveIncidentMetrics
+        incrementMetric(2, "ResolveIncident")
         changeIncidentStatus("resolve",incidents[incidentIndex], speechletSession)
     }
 
     private ackIncident(Session speechletSession) {
         List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
         int incidentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
-        incrementAcknowledgeIncidentMetrics
+        incrementMetric(1, "AcknowledgeIncident")
         changeIncidentStatus("ack",incidents[incidentIndex], speechletSession)
     }
 
@@ -317,7 +317,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         // Create the plain text output.
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
 
-        incrementLoginMetrics()
+        incrementMetric(0, "Login")
 
         // Create reprompt
         Reprompt reprompt = new Reprompt(outputSpeech: speech)
@@ -327,87 +327,21 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         SpeechletResponse.newAskResponse(speech, reprompt, card)
     }
 
-    private void incrementLoginMetrics() {
+    private void incrementMetric(int metricIndex, String metricName) {
         DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
         Table table = dynamoDB.getTable("VictorOpsMetrics");
-        Item item = table.getItem("id", 0);
+        Item item = table.getItem("id", metricIndex);
         int usedCount = 0;
         if (item != null) {
             usedCount = item.getInt("used")
         }
         usedCount++
         Item newItem = new Item()
-        newItem.withInt("id", 0)
-        newItem.withString("metric", "Login")
+        newItem.withInt("id", metricIndex)
+        newItem.withString("metric", metricName)
         newItem.withInt("used", usedCount)
         table.putItem(newItem)
     }
-
-    private void incrementAcknowledgeIncidentMetrics() {
-        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
-        Table table = dynamoDB.getTable("VictorOpsMetrics");
-        Item item = table.getItem("id", 1);
-        int usedCount = 0;
-        if (item != null) {
-            usedCount = item.getInt("used")
-        }
-        usedCount++
-        Item newItem = new Item()
-        newItem.withInt("id", 1)
-        newItem.withString("metric", "AcknowledgeIncident")
-        newItem.withInt("used", usedCount)
-        table.putItem(newItem)
-    }
-
-    private void incrementResolveIncidentMetrics() {
-        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
-        Table table = dynamoDB.getTable("VictorOpsMetrics");
-        Item item = table.getItem("id", 2);
-        int usedCount = 0;
-        if (item != null) {
-            usedCount = item.getInt("used")
-        }
-        usedCount++
-        Item newItem = new Item()
-        newItem.withInt("id", 2)
-        newItem.withString("metric", "ResolveIncident")
-        newItem.withInt("used", usedCount)
-        table.putItem(newItem)
-    }
-
-    private void incrementListIncidentMetrics() {
-        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
-        Table table = dynamoDB.getTable("VictorOpsMetrics");
-        Item item = table.getItem("id", 3);
-        int usedCount = 0;
-        if (item != null) {
-            usedCount = item.getInt("used")
-        }
-        usedCount++
-        Item newItem = new Item()
-        newItem.withInt("id", 3)
-        newItem.withString("metric", "ListIncidents")
-        newItem.withInt("used", usedCount)
-        table.putItem(newItem)
-    }
-
-    private void incrementListTeamsMetrics() {
-        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
-        Table table = dynamoDB.getTable("VictorOpsMetrics");
-        Item item = table.getItem("id", 4);
-        int usedCount = 0;
-        if (item != null) {
-            usedCount = item.getInt("used")
-        }
-        usedCount++
-        Item newItem = new Item()
-        newItem.withInt("id", 4)
-        newItem.withString("metric", "ListTeams")
-        newItem.withInt("used", usedCount)
-        table.putItem(newItem)
-    }
-
-
 
     SpeechletResponse whoIsOnCall(Session speechletSession) {
         ApiCredentials apiCredentials = getApiCredentials(speechletSession)
@@ -553,7 +487,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         if (!userCredentials) {
             return createLinkCard(speechletSession)
         }
-        incrementListIncidentMetrics()
+        incrementMetric(3, "ListIncidents")
+
 
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
@@ -631,7 +566,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             return createLinkCard(session)
         }
 
-        incrementListTeamsMetrics()
+        incrementListIncidentMetrics(4, "ListTeams")
+
 
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/",userCredentials)
