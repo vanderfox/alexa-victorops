@@ -582,7 +582,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             return createLinkCard(session)
         }
 
-        incrementListIncidentMetrics(4, "ListTeams")
+        incrementMetric(4, "ListTeams")
 
 
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
