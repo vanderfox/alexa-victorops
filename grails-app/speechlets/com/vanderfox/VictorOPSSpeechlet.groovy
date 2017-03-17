@@ -115,7 +115,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
 
-        return getWelcomeResponse()
+        return getWelcomeResponse(session.getUser().userId)
     }
 
     /**
@@ -308,7 +308,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         // any cleanup logic goes here
     }
 
-    SpeechletResponse getWelcomeResponse()  {
+    SpeechletResponse getWelcomeResponse(String userId)  {
         String speechText = "Welcome to the victorops skill - say List Open Incidents for open incidents or list teams"
 
         // Create the Simple card content.
@@ -318,6 +318,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
 
         incrementMetric(0, "Login")
+        userMetrics(userId)
 
         // Create reprompt
         Reprompt reprompt = new Reprompt(outputSpeech: speech)
@@ -340,6 +341,21 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         newItem.withInt("id", metricIndex)
         newItem.withString("metric", metricName)
         newItem.withInt("used", usedCount)
+        table.putItem(newItem)
+    }
+
+    private void userMetrics(String userId) {
+        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient());
+        Table table = dynamoDB.getTable("VictorOpsUserMetrics");
+        Item item = table.getItem("id", userId);
+        int timesUsed = 0;
+        if (item != null) {
+            timesUsed = item.getInt("timesUsed")
+        }
+        timesUsed++
+        Item newItem = new Item()
+        newItem.withString("id", userId)
+        newItem.withInt("timesUsed", timesUsed)
         table.putItem(newItem)
     }
 
