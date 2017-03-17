@@ -593,17 +593,17 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         String speechText = ""
         int teamcount = response.data.size()
-        if (startIndex > 0) {
+        if (startIndex < 1) {
             speechText = "You have ${teamcount} teams.\n"
         }
 
         session.setAttribute(TEAMS,response.data)
         session.setAttribute(TEAM_INDEX,startIndex as String)
-        if (teamcount > 0 && startIndex <= teamcount) {
+        if (teamcount > 0 && startIndex < teamcount) {
             speechText += "Team ${response.data[startIndex].name} - would you like to hear their on-call schedule?"
             askResponse(speechText,speechText)
         } else {
-            speechText += "You have no teams configured."
+            speechText += "You have no teams configured or no more teams. Goodbye."
             tellResponse(speechText,speechText)
         }
 
@@ -619,6 +619,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     SpeechletResponse sayTeamOncallSchedule(int teamIndex, Session session) {
+
+        DateTimeFormatter f = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault())
+
         ApiCredentials userCredentials = getApiCredentials(session)
         if (!userCredentials) {
             return createLinkCard(session)
@@ -628,21 +631,40 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         List teams = session.getAttribute(TEAMS)
         RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/team/${teams[teamIndex].slug}/oncall/",userCredentials)
 
-        def response = client.get(path:'schedule',query:['daysForward':'7'])
+        String daysForward = "3"
+        def response = client.get(path:'schedule',query:['daysForward':daysForward])
         log.debug("Got teams using index:${teamIndex}")
 
         String speechText = ""
         teamIndex--
 
-        if (teams[teamIndex] && response.data.team) {
+        if (teams[teamIndex] && response.data.team && response.data.schedule && response.data.schedule?.size() > 0) {
             speechText += "Team ${response.data.team} - on call schedule:\n"
-            speechText += "Rotation ${response.data.schedule.rotationName} Shift ${response.data.schedule.shiftName}\n"
-            response.data.schedule.rolls.each { roll ->
-                speechText += "User ${roll.onCall} is on call between ${roll.change} until ${roll.util}\n"
+
+            response.data.schedule.each { schedule ->
+                if (schedule.rotationName && schedule.shiftName) {
+                    speechText += "Rotation ${schedule.rotationName} Shift ${schedule.shiftName}\n "
+                }
+                if (schedule.onCall && !schedule.rolls && schedule?.rolls?.size() == 0) {
+                    speechText += "User ${schedule.onCall} is on call with no schedule.\n\n"
+                } else {
+                    speechText += "Roll schedule is:\n"
+                    schedule.rolls.each { roll ->
+                        ZonedDateTime zdtChange = ZonedDateTime.parse(roll.change, f)
+                        ZonedDateTime zdtUntil = ZonedDateTime.parse(roll.until, f)
+                        speechText += "User ${roll.onCall} is on call"
+                        if (roll.change && roll.until) {
+                            speechText += "between ${zdtChange.format(DateTimeFormatter.RFC_1123_DATE_TIME)} until ${zdtUntil.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\n"
+                        } else {
+                            speechText += "with no schedule.\n\n"
+                        }
+                    }
+                }
             }
 
-            speechText +" say next team or yes to go to the next team."
-            if (teamIndex <= teams.size()) {
+
+            if (teamIndex+2 < teams.size()) {
+                speechText +=" say next team to go to the next team or stop."
                 askResponse(speechText, speechText)
             } else {
                 speechText += "There are no more teams."
@@ -650,7 +672,14 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             }
         } else {
             speechText += "Unable to retrieve on call schedule for team ${teams[teamIndex].name}."
-            tellResponse(speechText,speechText)
+            if (teamIndex+2 < teams.size()) {
+                speechText += "Say next team to continue or stop."
+                askResponse(speechText,speechText)
+            } else {
+                speechText += "You have no more teams. Goodbye."
+                tellResponse(speechText,speechText)
+            }
+
         }
 
 
