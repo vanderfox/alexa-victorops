@@ -286,6 +286,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said. Say list incidents or acknowledge incidents for user or resolve incidents for user or list teams</speak>"
         askResponseFancy(speechText, speechText)
     }
+
     /**
      * Grails config is injected here for configuration of your speechlet
      * @param co Config
@@ -631,7 +632,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         }
 
         incrementListTeamsMetrics()
-        
+
         log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
         RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/",userCredentials)
 
