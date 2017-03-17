@@ -345,7 +345,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     private void userMetrics(String userId) {
-        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient());
+        DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new BasicAWSCredentials(System.getProperty("aws.access.key"), System.getProperty("aws.secret.key"))));
         Table table = dynamoDB.getTable("VictorOpsUserMetrics");
         Item item = table.getItem("id", userId);
         int timesUsed = 0;
