@@ -56,6 +56,7 @@ grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'com.va
 grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'com.vanderfox.RefreshToken'
 grails.plugin.springsecurity.ui.register.emailFrom = 'skills@vanderfox.com'
 grails.plugin.springsecurity.logout.postOnly = false
+grails.plugin.springsecurity.ui.forgotPassword.emailFrom="skills@vanderfox.com"
 //you can put fallback credentials here - if a user is not linked, or has none it will use these to demo
 
 com.amazon.speech.speechlet.servlet.disableRequestSignatureCheck=true
@@ -67,10 +68,7 @@ alexaSkills.serializeRequests = true // this logs the requests to disk to help y
 alexaSkills.serializeRequestsOutputPath = "/tmp/"
 // these urls come from the developer console - you may need to try it once to get the REAL url
 alexaSkills.oauth.redirectUrls = ['https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK',
-								  'https://layla.amazon.com/api/skill/link/M1M1AMAXAW4WEK',
-								  'https://pitangui.amazon.com/api/skill/link/M1M1AMAXAW4WEK',
-                                  'https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT',
-                                  'https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT']
+								  'https://layla.amazon.com/spa/skill/account-linking-status.html?M1M1AMAXAW4WEK']
 victorOPS.apiId = "" // not used with account linking
 victorOPS.apiKey = "" // not used with account linking
 victorOPS.userName = "vanderfoxalexa"
