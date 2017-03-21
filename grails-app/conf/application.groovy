@@ -21,7 +21,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 		[pattern: '/register/**', access: ['permitAll']],
 		//[pattern: '/logout/**', access: ['permitAll']],
 		[pattern: '/registrationCode/**', access: ['permitAll']],
-		[pattern: '/awsCredentials/**', access: ['isFullyAuthenticated()']],
+		[pattern: '/apiCredentials/**', access: ['isFullyAuthenticated()']],
 		[pattern: '/victorops/victorOPS/**', access: ['permitAll']],
 		[pattern: '/victorOPS/**', access: ['permitAll']],
 		[pattern: '/securityInfo/**', access: ['permitAll']],
@@ -30,7 +30,9 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 		[pattern: '/securityInfo/**', access: ['ROLE_ADMIN']],
 		[pattern: '/requestMap/**', access: ['ROLE_ADMIN']],
 		[pattern: '/oauth/authorize',           access: "isFullyAuthenticated() and (request.getMethod().equals('GET') or request.getMethod().equals('POST'))"],
-		[pattern: '/oauth/token',               access: "isFullyAuthenticated() and request.getMethod().equals('POST')"]
+		[pattern: '/oauth/token',               access: "isFullyAuthenticated() and request.getMethod().equals('POST')"],
+		[pattern: '/victorops/oauth/authorize',           access: "isFullyAuthenticated() and (request.getMethod().equals('GET') or request.getMethod().equals('POST'))"],
+		[pattern: '/victorops/oauth/token',               access: "isFullyAuthenticated() and request.getMethod().equals('POST')"]
 ]
 
 
@@ -48,24 +50,30 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 
 
 // Added by the Spring Security OAuth2 Provider plugin:
-grails.plugin.springsecurity.oauthProvider.clientLookup.className = 'com.com.com.vanderfox.Client'
-grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className = 'com.com.com.vanderfox.AuthorizationCode'
-grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'com.com.com.vanderfox.AccessToken'
-grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'com.com.com.vanderfox.RefreshToken'
-grails.plugin.springsecurity.ui.register.emailFrom = 'skills@com.com.vanderfox.com'
+grails.plugin.springsecurity.oauthProvider.clientLookup.className = 'com.vanderfox.Client'
+grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className = 'com.vanderfox.AuthorizationCode'
+grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'com.vanderfox.AccessToken'
+grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'com.vanderfox.RefreshToken'
+grails.plugin.springsecurity.ui.register.emailFrom = 'skills@vanderfox.com'
 grails.plugin.springsecurity.logout.postOnly = false
 //you can put fallback credentials here - if a user is not linked, or has none it will use these to demo
 
 com.amazon.speech.speechlet.servlet.disableRequestSignatureCheck=true
 // these are fallback appids comma delimited
 
-alexaSkills.supportedApplicationIds="amzn1.ask.skill.44951a75-4d6f-41f7-b558-0f0b68b8b1e4"
+alexaSkills.supportedApplicationIds="amzn1.ask.skill.44951a75-4d6f-41f7-b558-0f0b68b8b1e4,amzn1.ask.skill.0865a19e-597b-4050-a64e-21e98e36ab90"
 alexaSkills.disableVerificationCheck = true // helpful for debugging or replay a command via curl
 alexaSkills.serializeRequests = true // this logs the requests to disk to help you debug
 alexaSkills.serializeRequestsOutputPath = "/tmp/"
-alexaSkills.oauth.redirectUrls = ['https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK','https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK']
-victorOPS.apiId = "3cb197e7"
-victorOPS.apiKey = "f67e210930426baa610c8b4737835577"
+// these urls come from the developer console - you may need to try it once to get the REAL url
+alexaSkills.oauth.redirectUrls = ['https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK',
+								  'https://layla.amazon.com/api/skill/link/M1M1AMAXAW4WEK',
+								  'https://pitangui.amazon.com/api/skill/link/M1M1AMAXAW4WEK',
+                                  'https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT',
+                                  'https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT']
+victorOPS.apiId = "" // not used with account linking
+victorOPS.apiKey = "" // not used with account linking
+victorOPS.userName = "vanderfoxalexa"
 
 grails {
 	mail {
