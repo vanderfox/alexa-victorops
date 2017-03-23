@@ -25,6 +25,11 @@ class Client {
 
     static transients = ['springSecurityService']
 
+
+    static mapping = {
+        redirectUris joinTable: [column: 'REDIRECT_URIS_STRING', length: 4000]
+    }
+
     static constraints = {
         clientId blank: false, unique: true
         clientSecret nullable: true

@@ -40,20 +40,21 @@ class BootStrap {
         //TODO make these configurable
         new Client(
                 clientId: 'alexa-skill',
-                authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials'],
+                authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials','https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT',
+                                       'https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT'],
                 authorities: ['ROLE_CLIENT'],
                 scopes: ['read', 'write'],
                 redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
         ).save(flush: true)
         //TODO workaround until we can get oauth2 plugin to support redirectUris longer than 255 chars
-        new Client(
+       /* new Client(
                 clientId: 'alexa-skill-ryan',
                 authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials'],
                 authorities: ['ROLE_CLIENT'],
                 scopes: ['read', 'write'],
                 redirectUris: ['https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT',
                 'https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT']
-        ).save(flush: true)
+        ).save(flush: true)*/
 
     }
     def destroy = {
