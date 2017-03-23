@@ -669,12 +669,15 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                                 }
 
                             }
+                            speechText += "That is your on call schedule for the next 3 days"
+                        } else {
+                            speechText += "You are not on call for the next 3 days."
                         }
                     }
 
             }
 
-            speechText += "That is your on call schedule for the next 3 days"
+
             tellResponse(speechText,speechText)
 
         } else {
