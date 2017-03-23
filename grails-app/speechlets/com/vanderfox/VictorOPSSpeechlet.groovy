@@ -101,7 +101,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
         incrementMetric(0, "Login")
-        userMetrics(userId)
+        userMetrics(session.getUser().userId)
 
 
     }
