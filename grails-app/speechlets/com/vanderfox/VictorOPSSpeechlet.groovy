@@ -100,6 +100,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             throws SpeechletException {
         log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
+        incrementMetric(0, "Login")
+        userMetrics(userId)
+
 
     }
 
@@ -319,9 +322,6 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         // Create the plain text output.
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
-
-        incrementMetric(0, "Login")
-        userMetrics(userId)
 
         // Create reprompt
         Reprompt reprompt = new Reprompt(outputSpeech: speech)
