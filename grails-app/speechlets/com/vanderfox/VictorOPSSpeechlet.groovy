@@ -654,12 +654,12 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                             speechText += "Roll schedule is:\n"
                             schedule.rolls[0].each { roll ->
                                 log.debug("role=${roll.toString()}")
-                                if (roll.onCall[0] == userCredentials.username) {
+                                if (roll.onCall == userCredentials.username) {
 
                                     if (roll && roll.change && roll.until) {
 
-                                        ZonedDateTime zdtChange = ZonedDateTime.parse(roll.change[0], f)
-                                        ZonedDateTime zdtUntil = ZonedDateTime.parse(roll.until[0], f)
+                                        ZonedDateTime zdtChange = ZonedDateTime.parse(roll.change, f)
+                                        ZonedDateTime zdtUntil = ZonedDateTime.parse(roll.until, f)
 
                                         speechText += "You are on call"
                                         speechText += "between ${zdtChange.format(DateTimeFormatter.RFC_1123_DATE_TIME)} until ${zdtUntil.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\n"
