@@ -636,6 +636,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         if (response.data && response.data.size() > 0) {
             speechText += "${userCredentials.username}'s on call schedule is:\n"
 
+            int onCallCount = 0
             response.data.each { team ->
                     def schedule = team.schedule
                     log.debug("team:"+team.toString())
@@ -654,7 +655,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                             speechText += "Roll schedule is:\n"
                             schedule.rolls[0].each { roll ->
                                 log.debug("role=${roll.toString()}")
-                                if (roll.onCall == userCredentials.username) {
+                                if (roll.onCall == userCredentials.username)
+                                    onCallCount++
 
                                     if (roll && roll.change && roll.until) {
 
@@ -669,22 +671,20 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                                 }
 
                             }
-                            speechText += "That is your on call schedule for the next 3 days"
-                        } else {
-                            speechText += "You are not on call for the next 3 days."
+
                         }
                     }
+                    if (onCallCount == 0) {
+                        speechText += "You are not on call for the next 3 days."
+                    } else {
+                        speechText += "That is your on call schedule for the next 3 days"
+                    }
+
 
             }
 
 
             tellResponse(speechText,speechText)
-
-        } else {
-                speechText += "Unable to retrieve on call schedule for ${userCredentials.username}."
-                speechText += "You have no more teams. Goodbye."
-                tellResponse(speechText,speechText)
-        }
 
     }
 
