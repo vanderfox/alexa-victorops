@@ -5,7 +5,9 @@ AckIncidentByUser Acknowledge incidents for {username}
 ResolveIncidentByUser Resolve incident {username}
 ResolveIncidentByUser Resolve incidents for {username}
 AckIncident Acknowledge incident
-ResolveIncident Acknowledge incident
+AckIncident Acknowledge
+ResolveIncident Resolve incident
+ResolveIncident Resolve
 NextIncident Next
 NextIncident Next incident
 ListTeams List Teams
