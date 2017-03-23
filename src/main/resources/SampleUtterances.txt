@@ -15,6 +15,13 @@ NextTeam no
 SayTeamOnCallSchedule yes
 SayTeamOnCallSchedule schedule
 SayTeamOnCallSchedule team schedule
+WhenAmIOnCall when am I on call
+WhenAmIOnCall when am I on call next
+WhenAmIOnCall when am I next on call
+WhenAmIOnCall on call schedule
+WhenAmIOnCall my on call schedule
+WhenAmIOnCall on call
+WhenAmIOnCall on call schedule
 AMAZON.StopIntent stop
 AMAZON.StopIntent quit
 AMAZON.CancelIntent cancel

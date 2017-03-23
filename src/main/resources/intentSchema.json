@@ -40,6 +40,9 @@
             "intent": "SayTeamOnCallSchedule"
         },
         {
+            "intent": "WhenAmIOnCall"
+        },
+        {
             "intent": "AMAZON.HelpIntent"
         },
         {

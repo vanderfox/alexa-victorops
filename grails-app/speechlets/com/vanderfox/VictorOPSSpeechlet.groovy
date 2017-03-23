@@ -166,6 +166,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                 int teamIndex = session.getAttribute(TEAM_INDEX) as Integer
                 sayTeamOncallSchedule(teamIndex,session)
                 break
+            case "WhenAmIOnCall":
+                whenAmIOnCall(session)
+                break
             case "AMAZON.StopIntent":
             case "AMAZON.CancelIntent":
                 sayGoodbye()
@@ -283,7 +286,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     private SpeechletResponse didNotUnderstand() {
-        String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said. Say list incidents or acknowledge incidents for user or resolve incidents for user or list teams</speak>"
+        String speechText = "<speak><say-as interpret-as=\"interjection\">uh-oh!</say-as>  I didn't understand what you said. Say list incidents or acknowledge incidents for user or resolve incidents for user or list teams or when am I on call?</speak>"
         askResponseFancy(speechText, speechText)
     }
 
@@ -309,7 +312,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     SpeechletResponse getWelcomeResponse(String userId)  {
-        String speechText = "Welcome to the victorops skill - say List Open Incidents for open incidents or list teams"
+        String speechText = "Welcome to the victorops skill - say List Open Incidents for open incidents or list teams or when am I on call?"
 
         // Create the Simple card content.
         SimpleCard card = new SimpleCard(title: "VictorOPS", content: speechText)
@@ -539,7 +542,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
      * @return
      */
     SpeechletResponse getHelpResponse() {
-        String speechText = "Say list incidents or acknowledge incidents for user or resolve incidents for user"
+        String speechText = "Say list incidents or acknowledge incidents for user or resolve incidents for user or when am I on call"
         // Create the Simple card content.
         SimpleCard card = new SimpleCard(title:"VictorOPS Help",
                 content:speechText)
@@ -607,6 +610,78 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
             tellResponse(speechText,speechText)
         }
 
+
+    }
+
+    SpeechletResponse whenAmIOnCall(Session session) {
+        DateTimeFormatter f = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault())
+
+        incrementMetric(5, "WhenAmIOnCall")
+        ApiCredentials userCredentials = getApiCredentials(session)
+        if (!userCredentials) {
+            return createLinkCard(session)
+        }
+
+        log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
+
+        RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/user/${userCredentials.username}/oncall/",userCredentials)
+
+        String daysForward = "3"
+        def response = client.get(path:'schedule',query:['daysForward':daysForward])
+        log.debug("Got on call schedule for user ${userCredentials.username}")
+
+        String speechText = ""
+
+
+        if (response.data && response.data.size() > 0) {
+            speechText += "${userCredentials.username}'s on call schedule is:\n"
+
+            response.data.each { team ->
+                    def schedule = team.schedule
+                    log.debug("team:"+team.toString())
+                    log.debug("schedule:${schedule.toString()}")
+
+
+                    if (schedule.rotationName?.size() > 0 && schedule.shiftName?.size() > 0 && schedule.rotationName[0]!= null &&
+                            schedule.shiftName[0]!= null) {
+                        speechText += "Rotation ${schedule.rotationName} Shift ${schedule.shiftName}\n "
+                    }
+                    if (schedule.onCall && !schedule.rolls && schedule?.rolls?.size() == 0) {
+                        speechText += "User ${schedule.onCall} is on call with no schedule.\n\n"
+                    } else {
+                        if (schedule.rolls.size() > 0) {
+                            speechText += "Team ${team.team}\n\n"
+                            speechText += "Roll schedule is:\n"
+                            schedule.rolls[0].each { roll ->
+                                log.debug("role=${roll.toString()}")
+                                if (roll.onCall[0] == userCredentials.username) {
+
+                                    if (roll && roll.change && roll.until) {
+
+                                        ZonedDateTime zdtChange = ZonedDateTime.parse(roll.change[0], f)
+                                        ZonedDateTime zdtUntil = ZonedDateTime.parse(roll.until[0], f)
+
+                                        speechText += "You are on call"
+                                        speechText += "between ${zdtChange.format(DateTimeFormatter.RFC_1123_DATE_TIME)} until ${zdtUntil.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\n"
+                                    } else {
+                                        speechText += "with no schedule.\n\n"
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+
+            }
+
+            speechText += "That is your on call schedule for the next 3 days"
+            tellResponse(speechText,speechText)
+
+        } else {
+                speechText += "Unable to retrieve on call schedule for ${userCredentials.username}."
+                speechText += "You have no more teams. Goodbye."
+                tellResponse(speechText,speechText)
+        }
 
     }
 
