@@ -518,6 +518,13 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     }
 
+    SpeechletResponse somethingWentWrong() {
+        String cardText = "Ooops.  Something went wrong."
+        String speechText = "<speak><s><say-as interpret-as=\"interjection\">oops.</say-as></s>  Something went wrong.</speak>"
+        tellResponseFancy(cardText, speechText)
+    }
+
+
     /**
      * default responder when a help intent is launched on how to use your speechlet
      * @return
