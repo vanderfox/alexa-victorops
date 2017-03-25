@@ -732,9 +732,13 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     SpeechletResponse nextTeam(Session session) {
-        int teamIndex = session.getAttribute(TEAM_INDEX) as Integer
-        teamIndex++
-        listTeams(session, teamIndex)
+        if (session.getAttribute(TEAM_INDEX)!=null) {
+            int teamIndex = session.getAttribute(TEAM_INDEX) as Integer
+            teamIndex++
+            listTeams(session, teamIndex)
+        } else {
+            helpResponse
+        }
 
     }
 
