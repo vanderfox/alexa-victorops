@@ -711,7 +711,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                                 ZonedDateTime zdtChange = ZonedDateTime.parse(roll.change, f)
                                 ZonedDateTime zdtUntil = ZonedDateTime.parse(roll.until, f)
                                 if (now.isAfter(zdtChange.toLocalDateTime()) && now.isBefore(zdtUntil.toLocalDateTime())) {
-                                    peopleOnCall.add((String)roll.onCall)
+                                    peopleOnCall.add((String)roll.onCall+" from the ${team.name} team")
                                 }
                             }
                         }
