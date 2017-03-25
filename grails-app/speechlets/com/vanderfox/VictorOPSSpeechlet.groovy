@@ -122,7 +122,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
 
-        return getWelcomeResponse(session.getUser().userId)
+        return getWelcomeResponse()
     }
 
     /**
@@ -321,8 +321,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         // any cleanup logic goes here
     }
 
-    SpeechletResponse getWelcomeResponse(String userId)  {
-        String speechText = "Welcome to the victorops skill - say List Open Incidents for open incidents or list teams or when am I on call?"
+    SpeechletResponse getWelcomeResponse()  {
+        String cardText = "Welcome to the VictorOps skill.  Say List Open Incidents for open incidents or list teams or when am I on call?"
+        String speechText = "<speak>Welcome to the victorops skill - say List Open Incidents for open incidents or list teams or when am I on call?</speak>"
         askResponseFancy(speechText, speechText)
     }
 
