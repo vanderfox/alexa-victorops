@@ -441,18 +441,18 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
         def incident = incidents[indicentIndex]
         if (!incident) {
-            speechText += "<s>You have no more incidents.</s>"
+            speechText += "<s>You have no more incidents.</s></speak>"
             return tellResponseFancy(speechText,speechText)
         }
         ZonedDateTime zdt = ZonedDateTime.parse(incident.startTime, f)
         String ackedWord = ""
         if (incident.currentPhase == "ACKED") {
-            ackedWord = "<phoneme alphabet=\"ipa\" ph=\"æktːn\">acked</phoneme>"
+            ackedWord = "<phoneme alphabet=\"x-sampa\" ph=\"%{kd\">acked</phoneme>"
         } else {
-            ackedWord = "<phoneme alphabet=\"ipa\" ph=\"ʌnˈæktːn\">unacked</phoneme>"
+            ackedWord = "<phoneme alphabet=\"x-sampa\" ph=\"Vnˈ{ktːd\">unacked</phoneme>"
         }
 
-        speechText += "<s>incident <say-as interpret-as=\"cardinal\">id</say-as> ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${ackedWord}</s>"
+        speechText += "<s>incident <say-as interpret-as=\"characters\">id</say-as> <say-as interpret-as=\"digits\">${incident.incidentNumber}</say-as>\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${ackedWord}</s>"
         if (incident.currentPhase == "ACKED") {
             speechText += "<s>Would you like to Resolve or go to next incident?</s>"
         } else {
