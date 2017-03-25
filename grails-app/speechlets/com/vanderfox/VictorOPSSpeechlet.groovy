@@ -256,7 +256,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     private SpeechletResponse tellResponseFancy(String cardText, String speechText) {
         // Create the Simple card content.
         SimpleCard card = new SimpleCard()
-        card.setTitle("VictorOPS")
+        card.setTitle("VictorOps")
         card.setContent(cardText)
 
         // Create the plain text output.
@@ -276,7 +276,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     private SpeechletResponse tellResponse(String cardText, String speechText) {
         // Create the Simple card content.
         SimpleCard card = new SimpleCard()
-        card.setTitle("DevOps Assistant")
+        card.setTitle("VictorOps")
         card.setContent(cardText)
 
         // Create the plain text output.
@@ -332,8 +332,6 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         // Create reprompt
         Reprompt reprompt = new Reprompt(outputSpeech: speech)
-
-
 
         SpeechletResponse.newAskResponse(speech, reprompt, card)
     }
