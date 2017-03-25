@@ -32,6 +32,7 @@ import grails.web.Controller
 import groovy.util.logging.Slf4j
 import groovyx.net.http.*
 
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 import static groovyx.net.http.ContentType.JSON
@@ -699,7 +700,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
             def teamScheduleResponse = client.get(path: 'schedule', query: ['daysForward': 1])
             log.debug("Got team ${team.slug}")
-            LocalTime now = ZonedDateTime.now().toLocalDateTime()
+            LocalDateTime now = ZonedDateTime.now().toLocalDateTime()
 
             if (teamScheduleResponse.data.schedule && teamScheduleResponse.data.schedule?.size() > 0) {
 
@@ -709,7 +710,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                             if (roll.change && roll.until) {
                                 ZonedDateTime zdtChange = ZonedDateTime.parse(roll.change, f)
                                 ZonedDateTime zdtUntil = ZonedDateTime.parse(roll.until, f)
-                                if (now.isAfter(zdtChange.toLocalTime()) && now.isBefore(zdtUntil.toLocalTime())) {
+                                if (now.isAfter(zdtChange.toLocalDateTime()) && now.isBefore(zdtUntil.toLocalDateTime())) {
                                     peopleOnCall.add((String)roll.onCall)
                                 }
                             }

@@ -25,6 +25,10 @@ WhenAmIOnCall my on call schedule
 WhenAmIOnCall on call schedule
 WhoIsOnCall who is on call
 WhoIsOnCall who's on call
+WhoIsOnCall who's on call now
+WhoIsOnCall who is on call now
+WhoIsOnCall who is on call right now
+WhoIsOnCall who's on call right now
 AMAZON.StopIntent stop
 AMAZON.StopIntent quit
 AMAZON.CancelIntent cancel
