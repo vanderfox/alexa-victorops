@@ -720,7 +720,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
         }
         if (peopleOnCall.size()>0) {
-            speechText += "The following people are on call:\n"
+            speechText += "The following people are on call right now:\n"
             peopleOnCall.each { String person ->
                 speechText += "${person}\n\n"
             }
