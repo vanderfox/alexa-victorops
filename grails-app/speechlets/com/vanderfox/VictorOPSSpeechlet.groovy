@@ -690,12 +690,12 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         String speechText = ""
         List<String> peopleOnCall = []
         DateTimeFormatter f = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault())
-        response.data.team.each { team ->
+        response.data.each { team ->
 
 
             log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
 
-            client = buildRestClient("https://api.victorops.com/api-public/v1/team/${teams.slug}/oncall/", userCredentials)
+            client = buildRestClient("https://api.victorops.com/api-public/v1/team/${team.slug}/oncall/", userCredentials)
 
             def teamScheduleResponse = client.get(path: 'schedule', query: ['daysForward': 1])
             log.debug("Got team ${team.slug}")
