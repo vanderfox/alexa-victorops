@@ -323,8 +323,8 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     SpeechletResponse getWelcomeResponse()  {
         String cardText = "Welcome to the VictorOps skill.  Say List Open Incidents for open incidents or list teams or when am I on call?"
-        String speechText = "<speak>Welcome to the victorops skill - say List Open Incidents for open incidents or list teams or when am I on call?</speak>"
-        askResponseFancy(speechText, speechText)
+        String speechText = "<speak><s>Welcome to the victorops skill.</s><s>Say List Open Incidents for open incidents or list teams or when am I on call?</s></speak>"
+        askResponseFancy(cardText, speechText)
     }
 
     private void incrementMetric(int metricIndex, String metricName) {
@@ -429,30 +429,38 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     }
 
     SpeechletResponse sayIncident(Session speechletSession, Boolean sayCount = false, String speechText = "") {
+        speechText = "<speak>"
 
         int indicentIndex = speechletSession.getAttribute(INCIDENT_INDEX) as Integer
         List<Map> incidents = speechletSession.getAttribute(INCIDENTS) as List<Map>
 
         if (sayCount) {
-            speechText += "You have ${incidents.size()} incidents"
+            speechText += "<s>You have ${incidents.size()} incidents</s>"
 
         }
         DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault())
         def incident = incidents[indicentIndex]
         if (!incident) {
-            speechText += "You have no more incidents."
-            return tellResponse(speechText,speechText)
+            speechText += "<s>You have no more incidents.</s>"
+            return tellResponseFancy(speechText,speechText)
         }
         ZonedDateTime zdt = ZonedDateTime.parse(incident.startTime, f)
-        speechText += "incident i d ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${incident.currentPhase}\n\n\n"
+        String ackedWord = ""
         if (incident.currentPhase == "ACKED") {
-            speechText += "Would you like to Resolve or go to next incident?"
+            ackedWord = "<phoneme alphabet=\"ipa\" ph=\"æktːn\">acked</phoneme>"
         } else {
-            speechText += "Would you like to Acknowledge Resolve or go to next incident?"
+            ackedWord = "<phoneme alphabet=\"ipa\" ph=\"ʌnˈæktːn\">unacked</phoneme>"
         }
 
+        speechText += "<s>incident <say-as interpret-as=\"cardinal\">id</say-as> ${incident.incidentNumber}\n\n${incident.entityDisplayName}\n\nstarted at ${zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME)}\n\nand is currently\n\n${ackedWord}</s>"
+        if (incident.currentPhase == "ACKED") {
+            speechText += "<s>Would you like to Resolve or go to next incident?</s>"
+        } else {
+            speechText += "<s>Would you like to Acknowledge Resolve or go to next incident?</s>"
+        }
 
-        askResponse(speechText, speechText)
+        speechText += "</speak>"
+        askResponseFancy(speechText, speechText)
 
     }
 
