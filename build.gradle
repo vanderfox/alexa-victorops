@@ -106,7 +106,7 @@ assets {
 
 remotes {
     deadpool {
-        identity = file('../../../../.ssh/id_rsa')
+        identity = file('../.ssh/id_rsa')
         host = 'deadpool.vanderfox.com'
         user = 'root'
     }

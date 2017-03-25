@@ -323,17 +323,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     SpeechletResponse getWelcomeResponse(String userId)  {
         String speechText = "Welcome to the victorops skill - say List Open Incidents for open incidents or list teams or when am I on call?"
-
-        // Create the Simple card content.
-        SimpleCard card = new SimpleCard(title: "VictorOPS", content: speechText)
-
-        // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
-
-        // Create reprompt
-        Reprompt reprompt = new Reprompt(outputSpeech: speech)
-
-        SpeechletResponse.newAskResponse(speech, reprompt, card)
+        askResponseFancy(speechText, speechText)
     }
 
     private void incrementMetric(int metricIndex, String metricName) {
@@ -526,7 +516,7 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
     SpeechletResponse getHelpResponse() {
         String speechText = "Say list incidents or acknowledge incidents for user or resolve incidents for user or when am I on call"
         // Create the Simple card content.
-        SimpleCard card = new SimpleCard(title:"VictorOPS Help",
+        SimpleCard card = new SimpleCard(title:"VictorOps Help",
                 content:speechText)
         // Create the plain text output.
         PlainTextOutputSpeech speech = new PlainTextOutputSpeech(text:speechText)
