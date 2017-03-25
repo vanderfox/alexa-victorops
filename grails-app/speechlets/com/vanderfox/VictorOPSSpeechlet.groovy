@@ -31,6 +31,9 @@ import grails.core.support.GrailsConfigurationAware
 import grails.web.Controller
 import groovy.util.logging.Slf4j
 import groovyx.net.http.*
+
+import java.time.LocalTime
+
 import static groovyx.net.http.ContentType.JSON
 
 import java.time.LocalDate
@@ -171,6 +174,9 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
                 break
             case "WhenAmIOnCall":
                 whenAmIOnCall(session)
+                break
+            case "WhoIsOnCall":
+                whoIsOnCall(session)
                 break
             case "AMAZON.StopIntent":
             case "AMAZON.CancelIntent":
@@ -362,29 +368,6 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
         table.putItem(newItem)
     }
 
-    SpeechletResponse whoIsOnCall(Session speechletSession) {
-        ApiCredentials apiCredentials = getApiCredentials(speechletSession)
-        if (!apiCredentials) {
-            return createLinkCard(speechletSession)
-        }
-
-
-        RESTClient client = new RESTClient('https://api.victorops.com/api-public/v1/')
-        client.defaultRequestHeaders.'X-VO-Api-Id' = apiCredentials.apiId
-        client.defaultRequestHeaders.'X-VO-Api-Key' = apiCredentials.apiKey
-        client.defaultRequestHeaders.'Accept' = "application/json"
-        log.debug("Using API id:${grailsApplication.config.victorOPS.apiId} apiKey: ${grailsApplication.config.victorOPS.apiKey}")
-        def response = client.get(path:'incidents')
-        log.debug("Got incidents")
-
-        String speechText = ""
-
-        response.data.get("incidents").each { incident ->
-
-
-        }
-        tellResponse(speechText,speechText)
-    }
 
 
     SpeechletResponse changeIncidentStatus(String username, String status, Session speechletSession) {
@@ -688,6 +671,65 @@ class VictorOPSSpeechlet implements GrailsConfigurationAware, Speechlet {
 
     }
 
+
+    SpeechletResponse whoIsOnCall(Session session) {
+        ApiCredentials userCredentials = getApiCredentials(session)
+        if (!userCredentials) {
+            return createLinkCard(session)
+        }
+
+        incrementMetric(6, "WhoIsOnCall")
+
+
+        log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
+        RESTClient client = buildRestClient("https://api.victorops.com/api-public/v1/",userCredentials)
+
+        def response = client.get(path:'team')
+        log.debug("Got teams")
+
+        String speechText = ""
+        List<String> peopleOnCall = []
+        DateTimeFormatter f = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault())
+        response.data.team.each { team ->
+
+
+            log.debug("Using API id:${userCredentials.apiId} apiKey: ${userCredentials.apiKey}")
+
+            client = buildRestClient("https://api.victorops.com/api-public/v1/team/${teams.slug}/oncall/", userCredentials)
+
+            def teamScheduleResponse = client.get(path: 'schedule', query: ['daysForward': 1])
+            log.debug("Got team ${team.slug}")
+            LocalTime now = ZonedDateTime.now().toLocalDateTime()
+
+            if (teamScheduleResponse.data.schedule && teamScheduleResponse.data.schedule?.size() > 0) {
+
+                teamScheduleResponse.data.schedule.each { schedule ->
+                        schedule.rolls.each { roll ->
+
+                            if (roll.change && roll.until) {
+                                ZonedDateTime zdtChange = ZonedDateTime.parse(roll.change, f)
+                                ZonedDateTime zdtUntil = ZonedDateTime.parse(roll.until, f)
+                                if (now.isAfter(zdtChange.toLocalTime()) && now.isBefore(zdtUntil.toLocalTime())) {
+                                    peopleOnCall.add((String)roll.onCall)
+                                }
+                            }
+                        }
+                }
+            }
+
+        }
+        if (peopleOnCall.size()>0) {
+            speechText += "The following people are on call:\n"
+            peopleOnCall.each { String person ->
+                speechText += "${person}\n\n"
+            }
+        } else {
+            speechText += "There is currently no one on call"
+        }
+
+        tellResponse(speechText,speechText)
+
+    }
 
     SpeechletResponse nextTeam(Session session) {
         int teamIndex = session.getAttribute(TEAM_INDEX) as Integer

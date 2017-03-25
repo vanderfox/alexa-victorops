@@ -43,6 +43,9 @@
             "intent": "WhenAmIOnCall"
         },
         {
+            "intent": "WhoIsOnCall"
+        },
+        {
             "intent": "AMAZON.HelpIntent"
         },
         {
