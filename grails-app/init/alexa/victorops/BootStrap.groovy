@@ -29,23 +29,25 @@ class BootStrap {
             assert UserRole.count() == 2
         }
 
-        if (Client.count() == 0) {
-            new Client(
-                    clientId: 'my-client',
-                    authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials'],
-                    authorities: ['ROLE_CLIENT'],
-                    scopes: ['read', 'write'],
-                    redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
-            ).save(flush: true)
-            //TODO make these configurable
-            new Client(
-                    clientId: 'alexa-skill',
-                    authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials', 'https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT',
-                                           'https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT'],
-                    authorities: ['ROLE_CLIENT'],
-                    scopes: ['read', 'write'],
-                    redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
-            ).save(flush: true)
+        if (Client.count() > 0) {
+            Client.deleteAll(flush: true)
+        }
+        new Client(
+                clientId: 'my-client',
+                authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials'],
+                authorities: ['ROLE_CLIENT'],
+                scopes: ['read', 'write'],
+                redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
+        ).save(flush: true)
+        //TODO make these configurable
+        new Client(
+                clientId: 'alexa-skill',
+                authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials', 'https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT',
+                                       'https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT'],
+                authorities: ['ROLE_CLIENT'],
+                scopes: ['read', 'write'],
+                redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
+        ).save(flush: true)
         }
 
     }
