@@ -106,7 +106,7 @@ assets {
 
 remotes {
     deadpool {
-        identity = file('../../../../.ssh/alexaVictorOps.pem')
+        identity = file('../.ssh/alexaVictorOps.pem')
         host = '34.207.114.236'
         user = 'ubuntu'
     }

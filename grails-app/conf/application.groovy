@@ -67,7 +67,7 @@ alexaSkills.disableVerificationCheck = true // helpful for debugging or replay a
 alexaSkills.serializeRequests = true // this logs the requests to disk to help you debug
 alexaSkills.serializeRequestsOutputPath = "/tmp/"
 // these urls come from the developer console - you may need to try it once to get the REAL url
-alexaSkills.oauth.redirectUrls = ['https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT,https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT']
+alexaSkills.oauth.redirectUrls = ['https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT,https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=MX4X7ECUS4TZT,https://alexa.amazon.co.jp/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK,https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK,https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK']
 victorOPS.apiId = "" // not used with account linking
 victorOPS.apiKey = "" // not used with account linking
 victorOPS.userName = "vanderfoxalexa"

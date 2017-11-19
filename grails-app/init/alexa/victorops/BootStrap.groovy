@@ -48,7 +48,6 @@ class BootStrap {
                 scopes: ['read', 'write'],
                 redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
         ).save(flush: true)
-        }
 
     }
     def destroy = {
