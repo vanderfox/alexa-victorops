@@ -19,7 +19,7 @@ def logToFile = true
 if(logToFile) {
     appender("ROLLING_FILE", RollingFileAppender) {
         if (Environment.currentEnvironment == Environment.PRODUCTION) {
-            file = "/opt/tomcat/logs/alexaVictorOPS.log"
+            file = "/var/lib/tomcat8/logs/alexaVictorOPS.log"
         } else {
             file = "alexaVictorOPS.log"
         }

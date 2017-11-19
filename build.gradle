@@ -106,17 +106,23 @@ assets {
 
 remotes {
     deadpool {
-        identity = file('../.ssh/id_rsa')
-        host = 'deadpool.vanderfox.com'
-        user = 'root'
+        identity = file('../../../../.ssh/alexaVictorOps.pem')
+        host = '34.207.114.236'
+        user = 'ubuntu'
     }
 }
 
 task deploy << {
     ssh.run {
         session(remotes.deadpool) {
-            put from: 'build/libs/alexa-victorops-0.1.war', into: '/opt/tomcat/webapps/victorops.war'
-            execute 'sudo service tomcat restart'
+            put from: 'build/libs/alexa-victorops-0.1.war', into: '/var/lib/tomcat8/webapps/victorops.war'
+            execute 'sudo service tomcat8 restart'
         }
     }
+}
+
+springBoot {
+    // Enable the creation of a fully
+    // executable archive file.
+    executable = true
 }
